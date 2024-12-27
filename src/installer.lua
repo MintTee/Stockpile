@@ -1,15 +1,15 @@
 local files = {
-    "config/logger_config.txt",
-    "database/content.txt",
-    "database/inventories.txt",
-    "src/comms.lua",
-    "src/contentdb.lua",
-    "src/data_manager.lua",
-    "src/logger.lua",
-    "src/main.lua",
-    "src/move_item.lua",
-    "src/queue.lua",
-    "src/table_utils.lua",
+    "stockpile/config/logger_config.txt",
+    "stockpile/database/content.txt",
+    "stockpile/database/inventories.txt",
+    "stockpile/src/comms.lua",
+    "stockpile/src/contentdb.lua",
+    "stockpile/src/data_manager.lua",
+    "stockpile/src/logger.lua",
+    "stockpile/src/main.lua",
+    "stockpile/src/move_item.lua",
+    "stockpile/src/queue.lua",
+    "stockpile/src/table_utils.lua",
 }
 local install_success = true
 
@@ -19,7 +19,7 @@ for _, file in ipairs(files) do
     if response then
         local content = response.readAll()
         response.close()
-        local local_file = fs.open("stockpile/"..file, "w")
+        local local_file = fs.open(file, "w")
         local_file.write(content)
         local_file.close()
         print(file .. " download : Success")
