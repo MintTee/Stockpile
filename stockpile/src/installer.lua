@@ -1,9 +1,3 @@
-if http.checkURL("https://raw.githubusercontent.com") then
-    print("URL is allowed!")
-else
-    print("URL is not allowed.")
-end
-
 local files = {
     "file1.lua",
     "file2.lua",
@@ -11,7 +5,7 @@ local files = {
 }
 
 for _, file in ipairs(files) do
-    local url = "https://raw.githubusercontent.com/username/repository/branch/" .. file
+    local url = "https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/stockpile/src/installer.lua" .. file
     local response = http.get(url)
     if response then
         local content = response.readAll()
@@ -24,4 +18,3 @@ for _, file in ipairs(files) do
         print("Failed to download " .. file)
     end
 end
-    
