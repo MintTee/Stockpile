@@ -94,7 +94,6 @@ function contentdb.scan(invs)
     end
     queue.run()
 
-    data.save("/stockpile/database/item_name_lookup.txt", item_name_lookup)
     data.save("/stockpile/database/content.txt", content)
     return "Info : scan : Done"
 end
