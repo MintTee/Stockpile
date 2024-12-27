@@ -14,12 +14,12 @@ local files = {
 local install_success = true
 
 for _, file in ipairs(files) do
-    local url = "https://raw.githubusercontent.com/MintTee/refs/heads/main/" .. file
+    local url = "https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/" .. file
     local response = http.get(url)
     if response then
         local content = response.readAll()
         response.close()
-        local local_file = fs.open(file, "w")
+        local local_file = fs.open("stockpile/"..file, "w")
         local_file.write(content)
         local_file.close()
         print(file .. " downloaded successfully!")
