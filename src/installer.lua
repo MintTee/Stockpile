@@ -1,27 +1,27 @@
 local files = {
-    "stockpile/config/logger_config.txt",
-    "stockpile/database/content.txt",
-    "stockpile/database/inventories.txt",
-    "stockpile/src/comms.lua",
-    "stockpile/src/contentdb.lua",
-    "stockpile/src/data_manager.lua",
-    "stockpile/src/logger.lua",
-    "stockpile/src/main.lua",
-    "stockpile/src/move_item.lua",
-    "stockpile/src/queue.lua",
-    "stockpile/src/table_utils.lua",
+    "config/logger_config.txt",
+    "database/content.txt",
+    "database/inventories.txt",
+    "src/comms.lua",
+    "src/contentdb.lua",
+    "src/data_manager.lua",
+    "src/logger.lua",
+    "src/main.lua",
+    "src/move_item.lua",
+    "src/queue.lua",
+    "src/table_utils.lua",
 }
 local install_success = true
 
 for _, file in ipairs(files) do
-    local url = "https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/" .. file
+    local url = "https://raw.githubusercontent.com/MintTee/refs/heads/main/" .. file
     local response = http.get(url)
     if response then
         local content = response.readAll()
         response.close()
-        local localFile = fs.open(file, "w")
-        localFile.write(content)
-        localFile.close()
+        local local_file = fs.open("stockpile/"..file, "w")
+        local_file.write(content)
+        local_file.close()
         print(file .. " downloaded successfully!")
     else
         print("Failed to download " .. file)
@@ -49,7 +49,7 @@ end
 
 if write_startup then
   print('Stockpile will now run on startup.')
-  io.open('startup', 'w'):write("shell.run('.sigils/sigils.lua')"):close()
+  io.open('startup', 'w'):write([[shell.run("stockpile/src/main.lua"]]):close()
 end
 
 if install_success == true then
@@ -65,7 +65,7 @@ if install_success == true then
         sleep(1)
         os.reboot()
     else
-        print("To manually start Stockpile, run the program : '/stockpile/src/main.lua'")
+        print("To manually start Stockpile, run the program : 'stockpile/src/main.lua'")
     end
 else
     print("Couldn't properly download every file. If the problem persists, Open a new issue on the Stockpile's GitHub page :\n https://github.com/MintTee/Stockpile")
