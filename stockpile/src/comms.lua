@@ -1,0 +1,127 @@
+local move_item = require("/stockpile/src/move_item")
+local contentdb = require("/stockpile/src/contentdb")
+local logger = require("/stockpile/src/logger")
+require("/stockpile/var/globals")
+
+-- Environment for the modules
+local default_env = {
+    move_item = move_item,
+    --check = contentdb.check, --DEPRECATED FUNCTION
+    scan = contentdb.scan,
+    list_all_inventories = contentdb.list_all_inventories,
+    search = contentdb.search,
+    usage = contentdb.usage,
+    config_unit = contentdb.config_unit,
+    get_nbt = contentdb.get_nbt,
+    inventories = inventories,
+}
+
+local comms = {}
+
+-- Main function that waits for commands and processes them concurrently
+function comms.wait_for_command()
+    logger("Debug", "wait_for_command", "Waiting for a client to send a command...")
+    local cmd_queue = {}
+
+    parallel.waitForAny(
+        function() while true do receive_command(cmd_queue) end end,
+        function() while true do process_command(cmd_queue) end end
+    )
+end
+
+function comms.open_all_modems()
+    local connected_peripherals = peripheral.getNames()
+
+    for _, peri in ipairs(connected_peripherals) do
+        if peripheral.hasType(peri, "modem") then
+            rednet.open(peri)
+        end
+    end
+end
+
+-- Receives a command and adds it to the command queue if valid
+function receive_command(cmd_queue)
+    local sender_id, message = rednet.receive()
+    if type(message) ~= "string" and type(message) ~= "table" then
+        logger("Error", "receive_command", "Improper command recieved", "Command needs to be a table or a string type.")
+        rednet.send(sender_id, "Improper command recieved. Command needs to be a table or a string type. Consult the API for the proper syntax.")
+        return
+    end
+
+    if type(message) == "string" then message = {message} end
+    if not message[2] then message[2] = 1 end --Sets the UUID to 1 of none is provided
+
+    if not client_id_whitelist[sender_id] then
+        rednet.send(sender_id, "Client ID not allowed to send request. To whitelist, go to the server's config.")
+        logger("Warn", "receive_command", "Received from non-whitelisted client", "computer id #"..sender_id)
+
+    elseif sanitize_input(message[1]) == true then
+        logger("Info", "receive_command", "Command recieved", message[1].." UUID: "..message[2].." from computer id #"..sender_id)
+        table.insert(cmd_queue, {cmd = message[1], UUID = message[2], sender_id = sender_id})
+
+    else
+        logger("Warn", "receive_command", "Improper command recieved.", "Didn't pass the sanitization step.")
+        rednet.send(sender_id, "Improper command recieved. Consult the API for the proper syntax.")
+    end
+end
+
+-- Processes a command from the queue and sends the result back
+function process_command(cmd_queue)
+    if #cmd_queue > 0 then
+        local cmd_info = table.remove(cmd_queue, 1)
+        logger("Info", "wait_for_command", "Executing command", cmd_info.cmd)
+        local result = execute_chunk(cmd_info.cmd)
+        rednet.send(cmd_info.sender_id, {result, cmd_info.UUID})
+        logger("Info", "wait_for_command", "Returned results to client")
+    else
+        os.sleep(0.1)
+    end
+end
+
+-- Function to execute a chunk with the default environment
+function execute_chunk(chunk_str)
+    -- Load the chunk with the default environment
+    local chunk, err = load("return " .. chunk_str, "chunk", "t", default_env)
+    if not chunk then
+        return "Error : execute_chunk : Invalid method name. Refer to the Stockpile API wiki for the proper syntaxe."
+    end
+
+    local status, result_or_err = pcall(chunk)
+    
+    if not status then
+        return "Error : execute_chunk : Internal error, couldn't execute the method properly. "..result_or_err
+    end
+    
+    -- Return the result of the executed chunk
+    return result_or_err
+end
+
+-- Function to sanitize user input
+function sanitize_input(user_input)
+    -- Define the keys from the default_env table
+    local valid_keys = {
+        ["move_item" ]= true,
+        --check = true, --DEPRECATED FUNCTION
+        ["scan"] = true,
+        ["list_all_inventories"] = true,
+        ["search"] = true,
+        ["usage"] = true,
+        ["config_unit.add"] = true,
+        ["config_unit.remove"] = true,
+        ["config_unit.set"] = true,
+        ["config_unit.counts_towards_total"] = true,
+        ["inventories"] = true,
+        ["get_nbt"] = true,
+    }
+
+    local function_part = string.match(user_input, "^(.-)%(")
+
+    -- Return true if the key is found in the valid_keys table, otherwise return false
+    if valid_keys[function_part] == true then
+        return true
+    else
+        return false
+    end
+end
+
+return comms

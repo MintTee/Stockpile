@@ -1,0 +1,32 @@
+TODO LIST
+
+//////////// CODE ////////////
+
+//////////// ROAD-MAP ////////////
+
+3) Code an installer to install from a github repo the code
+
+4) Set git hub repo to public, make tutorials, make buy me coffee page
+
+5) Advertise the system
+
+6) Contributors have early access to client GUI and various interfacing (SIGILS etc)
+
+7) Code Stockpile User client
+
+8) Code SIGILS interface program (Try to top up items amount, simple check and request system)
+
+9) Code AutomationTM, a backend configurable automation software used to create complexe production chains interfacing
+with the central stockpile storage : (Autocrafting, furnace array, create processing etc...).
+
+//////////// TESTS TO CONDUCT ////////////
+
+2) Chunk loading and unloading effect on the system
+
+3) Ctrl + T effect on the system and way to finish current command and save data before exiting the program
+
+4) Test large number of items
+    A) Effect on content file size and limit in file size
+    B) Effect on delays and query times (timer in every function)
+
+5) Agressive bug testing

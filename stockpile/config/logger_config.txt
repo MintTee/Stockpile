@@ -1,0 +1,7 @@
+{
+    Debug = false,
+    Info = true,
+    Warn = true,
+    Error = true,
+    Debug_clutter = false,
+}
