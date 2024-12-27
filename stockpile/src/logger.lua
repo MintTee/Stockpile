@@ -2,7 +2,7 @@ local data = require("/stockpile/src/data_manager")
 require("/stockpile/var/globals")
 
 -- Define the maximum size for the logs table
-local MAX_LOG_SIZE = 200
+local MAX_LOG_SIZE = 300
 local SAVE_INTERVAL = 30
 local log_start = 1
 local log_count = #logs
