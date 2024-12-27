@@ -10,9 +10,9 @@ local files = {
     "src/move_item.lua",
     "src/queue.lua",
     "src/table_utils.lua",
-    "var/globals.lua"
-    "LICENSE"
-    "README.md"
+    "var/globals.lua",
+    "LICENSE",
+    "README.md",
 }
 
 local install_success = true
