@@ -19,7 +19,7 @@ for _, file in ipairs(files) do
     if response then
         local content = response.readAll()
         response.close()
-        local local_file = fs.open("stockpile/"..file, "w")
+        local local_file = fs.open(file, "w")
         local_file.write(content)
         local_file.close()
         print(file .. " downloaded successfully!")
@@ -56,7 +56,7 @@ if install_success == true then
     print("Stockpile was successfully installed !")
 
     if write_startup == true then
-        print("Restarting the computer in")
+        print("Restarting the computer in :")
         print("3")
         sleep(1)
         print("2")
@@ -69,5 +69,4 @@ if install_success == true then
     end
 else
     print("Couldn't properly download every file. If the problem persists, Open a new issue on the Stockpile's GitHub page :\n https://github.com/MintTee/Stockpile")
-    sleep(3)
 end
