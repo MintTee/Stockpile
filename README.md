@@ -10,6 +10,17 @@ Stockpile is a backend Minecraft storage system running on the CC: Tweaked mod. 
 - **NBT Support:** Filter searches and item transfers using regex searches in NBT data.
 - **Easy-to-Use API:** The API is comprehensive and can be called from any other computer, such as a frontend GUI client, automation programs like SIGILS, etc.
 
+## API
+```
+move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])
+search([item_filter], [nbt_filter])
+scan(inventories)
+usage()
+get_nbt(item_id)
+list_all_inventories()
+config_unit()
+```
+
 ## Limitations
 
 - **Modded Inventory Slot Sizes:** Stockpile doesn't support modded inventories that can hold more than 64 items per slot (like the Drawers mod). Support coming soon?
