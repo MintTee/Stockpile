@@ -49,7 +49,7 @@ end
 
 if write_startup then
   print('Stockpile will now run on startup.')
-  io.open('startup', 'w'):write([[shell.run("stockpile/src/main.lua"]]):close()
+  io.open('startup', 'w'):write([[shell.run("stockpile/src/main.lua")]]):close()
 end
 
 if install_success == true then
