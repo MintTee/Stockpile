@@ -4,7 +4,7 @@ Stockpile is a backend Minecraft storage system running on the CC: Tweaked mod. 
 
 ## Features
 
-- **Blazingly Fast:** Item transfer speed can reach up to 128k items per second. (yes, per second). Usually order O(1) search time in the database.
+- **Blazingly Fast:** Item transfer speed can reach up to 128k items per second. (yes, per second). Average search time in the database <1 ms
 - **Flexible and Expandable:** Easily add and remove inventories to be part of your storage and define custom inventory groups to suit your needs.
 - **Efficient:** Uses storage space in the most efficient way possible, always trying to stack items together.
 - **NBT Support:** Filter searches and item transfers using regex searches in NBT data.
