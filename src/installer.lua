@@ -22,7 +22,7 @@ for _, file in ipairs(files) do
         local local_file = fs.open("stockpile/"..file, "w")
         local_file.write(content)
         local_file.close()
-        print(file .. " downloaded successfully!")
+        print(file .. " download : Success")
     else
         print("Failed to download " .. file)
         install_success = false
@@ -68,5 +68,5 @@ if install_success == true then
         print("To manually start Stockpile, run the program : 'stockpile/src/main.lua'")
     end
 else
-    print("Couldn't properly download every file. If the problem persists, Open a new issue on the Stockpile's GitHub page :\n https://github.com/MintTee/Stockpile")
+    print("Couldn't properly download every file. If the problem persists, open a new issue on the Stockpile's GitHub page :\n https://github.com/MintTee/Stockpile")
 end
