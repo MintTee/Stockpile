@@ -16,7 +16,7 @@ In a Computer Craft computer, basic or advanced, type ```wget run https://raw.gi
 
 ## Tutorial
 
-**[Using the API]**
+### Using the API
 
 To execute an API method on the stockpile server, you will need to send a command over Rednet. The command has to be of a string or table type. You will first need to whitelist the client's computer id in the Stockpile server config file.
 
@@ -36,7 +36,7 @@ Examples :
 In order to collect the server's response, just use ```local server_id, response = rednet.recieve()``` to process it further.
 The server's response will be a table where index[1] is the response and the index[2] is the command UUID. 
 
-**[Whitelisting client IDs]**
+### Whitelisting client IDs
 
 In order for a stockpile server to allow and execute commands sent from other computers, their computer ID have to be whitelisted in the server. It's a simple security feature to somewhat protect your Stockpile system on untrusted online servers.
 
@@ -55,7 +55,7 @@ Example :
 ```
 5) Save the content of the file and reboot the computer.
 
-**[Logger settings]**
+### Logger settings
 
 A crude logger function is provided with Stockpile. You can access the servers logs in ```stockpile/logs/logs.txt```. You can set what kind of event will be logged in that file under ```stockpile/config/logger_config.txt``` and change the fields to either ```true``` or ```false``` depending on your debugging needs.
 
@@ -64,6 +64,8 @@ A crude logger function is provided with Stockpile. You can access the servers l
 *CommingSoonTM*
 
 ## API Documentation
+
+### move_item
 
 ```move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])```
 
@@ -96,6 +98,8 @@ Transfers up to 10 items matching "Sharpness" in their nbt from chest #20 and #2
 
 ---
 
+### search
+
 ```search([item_filter], [nbt_filter])```
 
 Regex search in your storage's database, that is, in all the content of your storage system.
@@ -117,6 +121,8 @@ Will only return the "minecraft:stone" item and not "minecraft:redstone" (becaus
 Will return the item "minecraft:tipped_arrow" of the "Healing" type and not the "Poison" type (because of the added nbt filter).
 
 ---
+
+### scan
 
 ```scan(inventories)```
 
@@ -144,6 +150,8 @@ Scans the content of the barrel #4 and chest #8.
 
 ---
 
+### usage
+
 ```usage()```
 
 Returns the usage of the storage over it's maximum capacity.
@@ -153,6 +161,8 @@ It calculate fullness by slots, meaning it will return the total amount of slots
 1. table - {["total_slots"] = amount, ["used_slots"] = amount}
 
 ---
+
+### get_nbt
 
 ```get_nbt(item_id)```
 
@@ -175,6 +185,8 @@ Gets the nbt data of the tipped arrow with the corresponding nbt hash, in that c
 
 ---
 
+### list_all_inventories
+
 ```list_all_inventories()```
 
 Returns a list of all the connected peripherals of the "inventory" type found in the server's network.
@@ -185,7 +197,7 @@ You process that list in order to easily configure units later on.
 
 ---
 
-```config_unit```
+### config_unit
 
 Functions to manipulate what we call "units", which are essentially groups of inventories.
 
