@@ -137,12 +137,19 @@ You process that list in order to easily configure units later on.
 Functions to manipulate what we call "units", which are essentially groups of inventories.
 
 `config_unit.set(invs, unit_name)`
+
 Sets the unit of the specified name to the provided inventory list. If invs = {}, the unit will be removed.
+
 `config_unit.add(invs, unit_name)`
+
 Adds the provided inventory list to the specified unit.
+
 `config_unit.remove(invs, unit_name)`
+
 Removes the provided inventory list from the specified unit.
+
 `config_unit.counts_towards_total(unit_name, counts_towards_total)`
+
 Tells stockpile to count the content of the specified unit towards in the total amount of item in the database.
 Use this method to prevent items in ouputs or inputs to be visible by the search() method for example.
 
