@@ -8,11 +8,12 @@ Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It pr
 - **Flexible and Expandable:** Easily add and remove inventories to be part of your storage and define custom inventory groups to suit your needs.
 - **Efficient:** Uses storage space in the most efficient way possible, always trying to stack items together.
 - **NBT Support:** Filter searches and item transfers using regex searches in NBT data.
+- **Large Capacity** Stockpile can handle up to 500k items in storage. *Working on increasing the capacity*.
 - **Easy-to-Use API:** The API is comprehensive and can be called from any other computer, such as a frontend GUI client, automation programs like SIGILS, etc.
 
 ## Installation
 
-In a Computer Craft computer, basic or advanced, type ```wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/src/installer.lua```
+In a Computer Craft computer, basic or advanced, type `wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/src/installer.lua`
 
 If you encounter any issues during the installation process, please report it.
 
@@ -30,38 +31,36 @@ The server's response over rednet will include that UUID, allowing you to asynch
 
 Format :
 
-```rednet.send(stockpile_server_id, {"command", [command_UUID]})```
+`rednet.send(stockpile_server_id, {"command", [command_UUID]})`
 
 Examples :
 
-```rednet.send(123, {[[scan(inventories.storage)]], math.random(1, 2^32)})```
-```rednet.send(321, [[list_all_inventories()]])```
+`rednet.send(123, {[[scan(inventories.storage)]], math.random(1, 2^32)})`
+`rednet.send(321, [[list_all_inventories()]])`
 
-In order to collect the server's response, just use ```local server_id, response = rednet.recieve()``` to process it further.
+In order to collect the server's response, just use `local server_id, response = rednet.recieve()` to process it further.
 
 The server's response will be a table where index[1] is the actual returned result and the index[2] is the command UUID. 
 
 #### Whitelisting client IDs
 
-In order for a stockpile server to allow and execute commands sent from other computers, their computer ID have to be whitelisted in the server.
+In order for a stockpile server to allow and execute commands sent from other computers, their computer ID have to be whitelisted.
+It's a basic security feature to protect your Stockpile system on public minecraft servers.
 
-It's a simple security feature to somewhat protect your Stockpile system on untrusted online minecraft servers.
-
-You can access the server's whitelisted client ids in ```stockpile/config/client_id_whitelist.txt``` and add or removed entries following this format : {[123] = true, [456] = true,}
+You can access the server's whitelisted client ids in `stockpile/config/client_id_whitelist.txt`.
 
 #### Logger settings
 
-A crude logger function is provided with Stockpile.
-
-You can access the servers logs in ```stockpile/logs/logs.txt```. You can set what kind of event will be logged in that file under ```stockpile/config/logger_config.txt``` and change the fields to either ```true``` or ```false``` depending on your debugging needs.
+You can access the servers logs in `stockpile/logs/logs.txt`.
+You can set what kind of event will be logged in that file under `stockpile/config/logger_config.txt` and change the fields to either `true` or `false` depending on your debugging needs.
 
 #### Video tutorials
 
-*CommingSoonTM*
+*ComingSoonTM*
 
 ## Limitations
 
-- **Modded Slot Sizes:** Stockpile doesn't support modded inventories that can hold more than 64 items per slot (like the Drawers mod). Support coming soon?
+- **Modded Slot Sizes:** Stockpile doesn't support modded inventories that can hold more than 64 items per slot (like the Drawers mod).
 - **NBT Limitations:** Due to limitations with the way CC: Tweaked interacts with Minecraft NBT data, Stockpile cannot read some NBT data like shulker content, potency or duration of potions, etc.
 
 ## Dependencies
