@@ -1,7 +1,5 @@
 local files = {
     "config/logger_config.txt",
-    "database/content.txt",
-    "database/inventories.txt",
     "src/comms.lua",
     "src/contentdb.lua",
     "src/data_manager.lua",
