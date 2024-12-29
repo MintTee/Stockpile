@@ -69,7 +69,7 @@ You can set what kind of event will be logged in that file under `stockpile/conf
 
 - **Modded Slot Sizes:** Stockpile doesn't support modded inventories that can hold more than 64 items per slot (like the Drawers mod).
 - **NBT Limitations:** Due to limitations with the way CC: Tweaked interacts with Minecraft NBT data, Stockpile cannot read some NBT data like shulker content, potency or duration of potions, etc.
-- **Not support for fluids mechanics yet** *ComingSoonTM*
+- **No support for fluids mechanics** *ComingSoonTM*
 
 ## Roadmap
 
