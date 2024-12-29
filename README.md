@@ -11,7 +11,7 @@ Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It pr
 
 ## Features
 
-- **Blazingly Fast:** Item transfer speed can reach up to 128k items per second. (yes, per second). Average search time in the database <1 ms.
+- **Blazingly Fast:** Item transfer speed can reach up to 128k items per *second*. Average search time in the database <10 ms.
 - **Flexible and Expandable:** Easily add and remove inventories to be part of your storage and define custom inventory groups to suit your needs.
 - **Efficient:** Uses storage space in the most efficient way possible, always trying to stack items together.
 - **NBT Support:** Filter searches and item transfers using regex searches in NBT data.
@@ -20,9 +20,9 @@ Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It pr
 
 ## Installation
 
-In a Computer Craft computer, basic or advanced, type `wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/src/installer.lua`
+Inside a Computer Craft computer, type `wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/src/installer.lua`
 
-If you encounter any issue during the installation process, please report it.
+If you encounter any issue during the installation process, please report it [here](https://github.com/MintTee/Stockpile/issues).
 
 ## How to use
 
@@ -69,6 +69,14 @@ You can set what kind of event will be logged in that file under `stockpile/conf
 
 - **Modded Slot Sizes:** Stockpile doesn't support modded inventories that can hold more than 64 items per slot (like the Drawers mod).
 - **NBT Limitations:** Due to limitations with the way CC: Tweaked interacts with Minecraft NBT data, Stockpile cannot read some NBT data like shulker content, potency or duration of potions, etc.
+- **Not support for fluids mechanics yet** *ComingSoonTM*
+
+## Roadmap
+
+- **Fluid support:** Adding a compete an easy to use fluid manager to Stockpile.
+- **GUI Survival Client** An easy to use comprehensive GUI Client to search and query items from Stockpile with search features similar to JEI, REI or EMI.  
+- **SIGILS Compat** A simple program to make interfacing Stockpile with [SIGILS](https://github.com/fechan/SIGILS) easy.
+- **Auto schematic material list** Feature to automatically pull every item requiered from a schematic material list.
 
 ## Dependencies
 
