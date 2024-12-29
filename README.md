@@ -5,7 +5,7 @@
 
 # Stockpile
 
-Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups. It includes powerful search tools in the storage content database.
+Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups in a fine controlled way. It includes powerful search tools in the storage content database.
 
 **[Documentation](https://github.com/MintTee/Stockpile/blob/main/Documentation.md)** here.
 
@@ -15,8 +15,7 @@ Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It pr
 - **Flexible and Expandable:** Easily add and remove inventories to be part of your storage and define custom inventory groups to suit your needs.
 - **Efficient:** Uses storage space in the most efficient way possible, always trying to stack items together.
 - **NBT Support:** Filter searches and item transfers using regex searches in NBT data.
-- **Large Capacity** Stockpile can handle up to 500k items in storage. *Working on increasing the capacity*.
-- **Easy-to-Use API:** The API is comprehensive and can be called from any other computer, such as a frontend GUI client, automation programs like SIGILS, etc.
+- **Easy-to-Use API:** The API is comprehensive and can be called from any other computer, such as a frontend GUI client, automation programs, etc.
 
 ## Installation
 
