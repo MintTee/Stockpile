@@ -13,6 +13,7 @@ local files = {
     "var/globals.lua",
     "LICENSE",
     "README.md",
+    "Documentation.md",
 }
 
 local install_success = true
@@ -40,8 +41,8 @@ io.open("stockpile/logs/logs.txt", 'w'):close()
 
 local write_startup
 while write_startup == nil do
-  print('Run Stockpile when the computer starts up? (press y/n)')
-  print('(If not, you must manually restart Stockpile if the chunk the computer is in is unloaded.)')
+  print("\nRun Stockpile when the computer starts up? (press y/n)")
+  print("(If not, you must manually restart Stockpile if the chunk the computer is in is unloaded.)")
   local event, char = os.pullEvent('char')
   print(char)
   if string.lower(char) == 'y' then
