@@ -39,7 +39,7 @@ io.open("stockpile/database/inventories.txt", 'w'):write("{}"):close()
 io.open("stockpile/logs/logs.txt", 'w'):close()
 
 local write_startup
-while write_startup == nil do
+while not write_startup do
   print("\nRun Stockpile when the computer starts up? (press y/n)")
   print("(If not, you must manually restart Stockpile if the chunk the computer is in is unloaded.)")
   local event, char = os.pullEvent('char')
@@ -56,10 +56,10 @@ if write_startup then
   io.open('startup.lua', 'w'):write([[shell.run("stockpile/src/main.lua")]]):close()
 end
 
-if install_success == true then
+if install_success then
     print("Stockpile was successfully installed !")
 
-    if write_startup == true then
+    if write_startup then
         print("Restarting the computer in :")
         print("3")
         sleep(1)
