@@ -7,6 +7,8 @@
 
 Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups. It includes powerful search tools in the storage content database.
 
+**[Documentation]**(https://github.com/MintTee/Stockpile/blob/main/Documentation.md) here
+
 ## Features
 
 - **Blazingly Fast:** Item transfer speed can reach up to 128k items per second. (yes, per second). Average search time in the database <1 ms.
@@ -24,7 +26,7 @@ If you encounter any issue during the installation process, please report it.
 
 ## How to use
 
-#### The API
+#### [The API](https://github.com/MintTee/Stockpile/blob/main/Documentation.md)
 
 To execute an API method on the stockpile server, you will need to send a command over Rednet. The command has to be of a string or table type. You will first need to whitelist the client's computer id in the Stockpile server config file.
 
