@@ -33,7 +33,7 @@ for _, file in ipairs(files) do
     end
 end
 
-io.open("stockpile/config/client_id_whitelist.txt", 'w'):write("{}"):close()
+io.open("stockpile/config/client_id_whitelist.txt", 'w'):write("{ [ 123 ] = true, }"):close()
 io.open("stockpile/database/content.txt", 'w'):write("{}"):close()
 io.open("stockpile/database/inventories.txt", 'w'):write("{}"):close()
 io.open("stockpile/logs/logs.txt", 'w'):close()
