@@ -31,11 +31,19 @@ end
 
 function comms.open_all_modems()
     local connected_peripherals = peripheral.getNames()
+    local modem_found = false
 
     for _, peri in ipairs(connected_peripherals) do
         if peripheral.hasType(peri, "modem") then
             rednet.open(peri)
+            modem_found = true
         end
+    end
+    if modem_found = false then
+        logger("Warn", "open_all_modems", "No modem found in the network", "Can't communicate with other computers.")
+        return false
+    else
+        return true
     end
 end
 
