@@ -14,6 +14,7 @@ local files = {
     "LICENSE",
     "README.md",
     "Documentation.md",
+    "CONTRIBUTING.md",
 }
 
 local install_success = true
