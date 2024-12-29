@@ -1,3 +1,8 @@
+<div align="center">
+  <img width="128px" alt="icon" src="icon.png">  
+</div>
+
+
 # Stockpile
 
 Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups. It includes powerful search tools in the storage content database.
@@ -15,7 +20,7 @@ Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It pr
 
 In a Computer Craft computer, basic or advanced, type `wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/src/installer.lua`
 
-If you encounter any issues during the installation process, please report it.
+If you encounter any issue during the installation process, please report it.
 
 ## How to use
 

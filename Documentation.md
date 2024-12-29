@@ -1,6 +1,8 @@
 
 # Stockpile API Documentation
 
+---
+
 ## move_item
 
 `move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])`
@@ -134,7 +136,7 @@ You process that list in order to easily configure units later on.
 
 ## config_unit
 
-Functions to manipulate what we call "units", which are essentially groups of inventories.
+**Functions to manipulate what we call "units", which are essentially groups of inventories.**
 
 `config_unit.set(invs, unit_name)`
 
