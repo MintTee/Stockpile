@@ -1,4 +1,5 @@
 *Heads up*
+
 I am very new to programming and I am very inexperienced with git, GitHub, and programming languages in general. My code is probably not following the industry's best practices, and therefore I ask you to be indulgent with your review of the code's quality. Stockpile is my first real programming project. Yet, I am confident Stockpile has a purpose and can be maintained and improved to be truly great!
 
 # Contributing to Stockpile
