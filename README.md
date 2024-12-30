@@ -5,7 +5,7 @@
 
 # Stockpile
 
-Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups in a fine controlled way. It includes powerful search tools in the storage content database.
+Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups in a finely controlled way. It includes powerful search tools in the storage content database.
 
 **[Documentation](https://github.com/MintTee/Stockpile/blob/main/Documentation.md)** here.
 
