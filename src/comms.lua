@@ -39,7 +39,8 @@ function comms.open_all_modems()
             modem_found = true
         end
     end
-    if modem_found = false then
+    
+    if modem_found == false then
         logger("Warn", "open_all_modems", "No modem found in the network", "Can't communicate with other computers.")
         return false
     else
