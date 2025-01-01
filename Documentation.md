@@ -1,5 +1,41 @@
-
 # Stockpile API Documentation
+
+
+## How to use the API
+
+To execute an API method on the stockpile server, you will need to send a command over Rednet. The command has to be of a string or table type. You will first need to whitelist the client's computer id in the Stockpile server config file.
+
+It's recommended to format the command as a table such as :
+- index[1] is the string formatted API method you want to execute.
+- index[2] is a unique identifier for the command.
+
+The server's response over rednet will include that UUID, allowing you to asynchronously know which servers's response correspond to what command. The UUID will default to 1 if none is provided.
+
+Format :
+
+`rednet.send(stockpile_server_id, {"command", [command_UUID]})`
+
+Examples :
+
+`rednet.send(123, {[[scan(inventories.storage)]], math.random(1, 2^32)})`
+`rednet.send(321, [[list_all_inventories()]])`
+
+In order to collect the server's response, just use `local server_id, response = rednet.recieve()` to process it further.
+
+The server's response will be a table where index[1] is the actual returned result and the index[2] is the command UUID. 
+
+---
+
+**All API commands:**
+*[arg] = Optional argument.*
+
+[move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])](#move_item)
+[search([item_filter], [nbt_filter])](#search)
+[scan(inventories)](#scan)
+[usage()](#usage)
+[get_nbt(item_id)](#get_nbt)
+[list_all_inventories()](#list_all_inventories)
+[config_unit()](#config_unit)
 
 ---
 
@@ -38,10 +74,8 @@ You can combine the three filters for fine control over the moved item parameter
 
 ## search
 `search([item_filter], [nbt_filter])`
+`scan(inventories)`
 
-Regex search in your storage's database, that is, in all the content of your storage system.
-
-**Arguments**
 
 1. `item_filter` : string - Regex filter for the item ids. If an item id matches this filter, it will be added to the returned result list.
 2. `nbt_filter` : string - Regex filter for the item ids. If an item's serialized nbt data matches this filter, it will be added to the returned result list.

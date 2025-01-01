@@ -39,7 +39,7 @@ function comms.open_all_modems()
             modem_found = true
         end
     end
-    
+
     if modem_found == false then
         logger("Warn", "open_all_modems", "No modem found in the network", "Can't communicate with other computers.")
         return false
@@ -60,14 +60,9 @@ function receive_command(cmd_queue)
     if type(message) == "string" then message = {message} end
     if not message[2] then message[2] = 1 end --Sets the UUID to 1 of none is provided
 
-    if not client_id_whitelist[sender_id] then
-        rednet.send(sender_id, "Client ID not allowed to send request. To whitelist, go to the server's config.")
-        logger("Warn", "receive_command", "Received from non-whitelisted client", "computer id #"..sender_id)
-
-    elseif sanitize_input(message[1]) == true then
+    if sanitize_input(message[1]) == true then
         logger("Info", "receive_command", "Command recieved", message[1].." UUID: "..message[2].." from computer id #"..sender_id)
         table.insert(cmd_queue, {cmd = message[1], UUID = message[2], sender_id = sender_id})
-
     else
         logger("Warn", "receive_command", "Improper command recieved.", "Didn't pass the sanitization step.")
         rednet.send(sender_id, "Improper command recieved. Consult the API for the proper syntax.")
