@@ -29,13 +29,13 @@ The server's response will be a table where index[1] is the actual returned resu
 **All API commands:**
 *[arg] = Optional argument.*
 
-[move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])](#move_item)
-[search([item_filter], [nbt_filter])](#search)
-[scan(inventories)](#scan)
-[usage()](#usage)
-[get_nbt(item_id)](#get_nbt)
-[list_all_inventories()](#list_all_inventories)
-[config_unit()](#config_unit)
+[move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])](#move_item)\
+[search([item_filter], [nbt_filter])](#search)\
+[scan(inventories)](#scan)\
+[usage()](#usage)\
+[get_nbt(item_id)](#get_nbt)\
+[list_all_inventories()](#list_all_inventories)\
+[config_unit()](#config_unit)\
 
 ---
 
