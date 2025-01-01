@@ -27,7 +27,7 @@ The server's response will be a table where index[1] is the actual returned resu
 ---
 
 **All API commands:**\
-*[arg] = Optional argument.*\
+*[arg] = Optional argument.*
 
 [move_item(from_invs, to_invs, [item_filter], [quantity_filter], [nbt_filter])](#move_item)\
 [search([item_filter], [nbt_filter])](#search)\
