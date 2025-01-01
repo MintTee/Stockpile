@@ -35,7 +35,7 @@ The server's response will be a table where index[1] is the actual returned resu
 [usage()](#usage)\
 [get_nbt(item_id)](#get_nbt)\
 [list_all_inventories()](#list_all_inventories)\
-[config_unit()](#config_unit)\
+[config_unit()](#config_unit)
 
 ---
 
