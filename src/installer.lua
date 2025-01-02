@@ -38,7 +38,7 @@ io.open("stockpile/database/inventories.txt", 'w'):write("{}"):close()
 io.open("stockpile/logs/logs.txt", 'w'):close()
 
 local write_startup
-while not write_startup do
+while write_startup == nil do
   print("\nRun Stockpile when the computer starts up? (press y/n)")
   print("(If not, you must manually restart Stockpile if the chunk the computer is in is unloaded.)")
   local event, char = os.pullEvent('char')
