@@ -50,7 +50,7 @@ while write_startup == nil do
   end
 end
 
-if write_startup then
+if write_startup == true then
   print('Stockpile will now run on startup.')
   io.open('startup.lua', 'w'):write([[shell.run("stockpile/src/main.lua")]]):close()
 end
