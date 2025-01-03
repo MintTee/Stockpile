@@ -58,7 +58,7 @@ end
 if install_success == true then
     print("Stockpile was successfully installed !")
 
-    if write_startup then
+    if write_startup ==true then
         print("Restarting the computer in :")
         print("3")
         sleep(1)
@@ -67,9 +67,9 @@ if install_success == true then
         print("1")
         sleep(1)
         os.reboot()
-    elseif install_success == false then
+    elseif write_startup == false then
         print("To manually start Stockpile, run the program : 'stockpile/src/main.lua'")
     end
-else
+elseif install_success == false then
     print("Couldn't properly download every file. If the problem persists, open a new issue on the Stockpile's GitHub page :\n https://github.com/MintTee/Stockpile")
 end
