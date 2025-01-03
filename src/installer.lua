@@ -55,7 +55,7 @@ if write_startup then
   io.open('startup.lua', 'w'):write([[shell.run("stockpile/src/main.lua")]]):close()
 end
 
-if install_success then
+if install_success == true then
     print("Stockpile was successfully installed !")
 
     if write_startup then
@@ -67,7 +67,7 @@ if install_success then
         print("1")
         sleep(1)
         os.reboot()
-    else
+    elseif install_success == false then
         print("To manually start Stockpile, run the program : 'stockpile/src/main.lua'")
     end
 else
