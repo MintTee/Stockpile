@@ -35,6 +35,7 @@ The server's response will be a table where index[1] is the actual returned resu
 [usage()](#usage)\
 [get_nbt(item_id)](#get_nbt)\
 [list_all_inventories()](#list_all_inventories)\
+[get_content](#get_content)\
 [unit()](#unit)
 
 ---
@@ -165,6 +166,17 @@ You process that list in order to easily configure units later on.
 
 **Returns**
 1. table - List of all connected inventories.
+
+---
+
+## get_content
+
+`get_content()`
+
+Returns the "content" table, representing all of the current server's storage content. Can be used later on by a client.
+
+**Returns**
+1. table - List of all the current storage content.
 
 ---
 

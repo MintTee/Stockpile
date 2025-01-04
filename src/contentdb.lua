@@ -408,4 +408,8 @@ function contentdb.get_nbt(item_id)
     return table_utils.try_get_value(content, {"item_index", item_id, "nbt"})
 end
 
+function contentdb.get_content()
+    return content
+end
+
 return contentdb

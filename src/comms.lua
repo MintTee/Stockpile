@@ -13,6 +13,7 @@ local default_env = {
     usage = contentdb.usage,
     unit = contentdb.unit,
     get_nbt = contentdb.get_nbt,
+    get_content = contentdb.get_content,
     inventories = inventories,
 }
 
@@ -117,6 +118,7 @@ function sanitize_input(user_input)
         ["unit.get"] = true,
         ["inventories"] = true,
         ["get_nbt"] = true,
+        ["get_content"] = true,
     }
 
     local function_part = string.match(user_input, "^(.-)%(")
