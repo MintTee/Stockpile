@@ -5,7 +5,7 @@ local data = require("/stockpile/src/data_manager")
 require("/stockpile/var/globals")
 
 contentdb = {}
-contentdb.config_unit = {}
+contentdb.unit = {}
 
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -124,7 +124,7 @@ end
 
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function contentdb.config_unit.counts_towards_total(unit_name, counts_towards_total)
+function contentdb.unit.counts_towards_total(counts_towards_total, unit_name)
 
     local function inv_counts_towards_total(inv, boolean)
         if not inventories["total_count"] then
@@ -134,10 +134,10 @@ function contentdb.config_unit.counts_towards_total(unit_name, counts_towards_to
     end
 
     if unit_name == "total_count" then
-        return "Error : config_unit.counts_towards_total : unit_name arg can't be 'total_count' because of a naming conflict."
+        return "Error : unit.counts_towards_total : unit_name arg can't be 'total_count' because of a naming conflict."
     end
     if not inventories[unit_name] then
-        return "Error : config_unit.counts_towards_total : unit_name does not yet exist. Use the API method 'config_unit' to create it."
+        return "Error : unit.counts_towards_total : unit_name does not yet exist. Use the API method 'unit' to create it."
     end
 
     --Sets the count towards total parameter in the inventories table. Just needs the unit name and a boolean.
@@ -146,10 +146,10 @@ function contentdb.config_unit.counts_towards_total(unit_name, counts_towards_to
     end
 
     data.save("/stockpile/database/inventories.txt", inventories)
-    return "Info : config_unit.counts_towards_total : Done"
+    return "Info : unit.counts_towards_total : Done"
 end
 
-function contentdb.config_unit.add(invs, unit_name)
+function contentdb.unit.add(invs, unit_name)
 
     if not inventories[unit_name] then
         inventories[unit_name] = {}
@@ -158,24 +158,24 @@ function contentdb.config_unit.add(invs, unit_name)
     for _, inv in ipairs(invs) do
         if table_utils.contains_value(inventories[unit_name], inv) == false then
             table.insert(inventories[unit_name], inv)
-            logger("Info", "contentdb.config_unit.add", "Added inventory", inv.." from unit "..unit_name)
+            logger("Info", "contentdb.unit.add", "Added inventory", inv.." from unit "..unit_name)
         end
     end
     data.save("/stockpile/database/inventories.txt", inventories)
-    return "Info : config_unit.add : Done."
+    return "Info : unit.add : Done."
 end
 
-function contentdb.config_unit.remove(invs, unit_name)
+function contentdb.unit.remove(invs, unit_name)
 
     if not inventories[unit_name] then
-        return "Info : config_unit.remove : unit_name does not exist."
+        return "Info : unit.remove : unit_name does not exist."
     end
 
     for _, inv in ipairs(invs) do
         for k, v in pairs(inventories[unit_name]) do
             if v == inv then
                 table.remove(inventories[unit_name], k)
-                logger("Info", "contentdb.config_unit.remove", "Removed inventory", inv.." from unit "..unit_name)
+                logger("Info", "contentdb.unit.remove", "Removed inventory", inv.." from unit "..unit_name)
             end
         end
     end
@@ -185,19 +185,23 @@ function contentdb.config_unit.remove(invs, unit_name)
     end
 
     data.save("/stockpile/database/inventories.txt", inventories)
-    return "Info : config_unit.remove : Done."
+    return "Info : unit.remove : Done."
 end
 
-function contentdb.config_unit.set(invs, unit_name)
+function contentdb.unit.set(invs, unit_name)
     if not invs or invs[1] == nil then
         inventories[unit_name] = nil
-        logger("Info", "contentdb.config_unit.set", "Successfully removed unit", unit_name)
+        logger("Info", "contentdb.unit.set", "Successfully removed unit", unit_name)
     else
         inventories[unit_name] = invs
-        logger("Info", "contentdb.config_unit.set", "Successfully set unit inventories", unit_name)
+        logger("Info", "contentdb.unit.set", "Successfully set unit inventories", unit_name)
     end
     data.save("/stockpile/database/inventories.txt", inventories)
-    return "Info : config_unit.set : Done."
+    return "Info : unit.set : Done."
+end
+
+function contentdb.unit.get()
+    return inventories
 end
 
 --///////////////////////////////////////////////////////////////////////////////////////////////////////

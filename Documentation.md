@@ -35,7 +35,7 @@ The server's response will be a table where index[1] is the actual returned resu
 [usage()](#usage)\
 [get_nbt(item_id)](#get_nbt)\
 [list_all_inventories()](#list_all_inventories)\
-[config_unit()](#config_unit)
+[unit()](#unit)
 
 ---
 
@@ -168,23 +168,27 @@ You process that list in order to easily configure units later on.
 
 ---
 
-## config_unit
+## unit
 
 **Functions to manipulate what we call "units", which are essentially groups of inventories.**
 
-`config_unit.set(invs, unit_name)`
+`unit.set(invs, unit_name)`
 
 Sets the unit of the specified name to the provided inventory list. If invs = {}, the unit will be removed.
 
-`config_unit.add(invs, unit_name)`
+`unit.add(invs, unit_name)`
 
 Adds the provided inventory list to the specified unit.
 
-`config_unit.remove(invs, unit_name)`
+`unit.remove(invs, unit_name)`
 
 Removes the provided inventory list from the specified unit.
 
-`config_unit.counts_towards_total(unit_name, counts_towards_total)`
+`unit.get()`
+
+Returns the entire "inventories" table, itself containing the subtables of each units and their compositon. "inventories" also contains the "total_count" table, indicating which inventory should be counted towards the total of items.
+
+`unit.counts_towards_total(counts_towards_total, unit_name)`
 
 Tells stockpile to count the content of the specified unit towards in the total amount of item in the database.
 Use this method to prevent items in ouputs or inputs to be visible by the search() method for example.
@@ -198,4 +202,4 @@ Use this method to prevent items in ouputs or inputs to be visible by the search
 3. `counts_towards_total` : boolean - true = will count towards the total, false = will ignored those inventories when counting the total.
 
 **Returns**
-1. string - `Info : config_unit.function : Done`
+1. string - `Info : unit.subfunction : Done`
