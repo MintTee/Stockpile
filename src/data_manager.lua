@@ -27,9 +27,33 @@ end
 -- Constant for large file save function
 local RESERVED_SPACE = 20 * 1024  -- Reserve 20KB on each floppy disk
 
--- Save a table to disk(s), fragmenting it dynamically based on available space
+-- Helper function to remove old chunks associated with a given base name
+local function remove_old_chunks(base_name)
+    local disks = {}  -- Collect available disks
+    for _, entry in ipairs(fs.list("/")) do
+        if entry:match("^disk%d+$") or entry:match("^disk$") then
+            local disk_path = "/" .. entry .. "/"
+            table.insert(disks, disk_path)
+        end
+    end
+
+    -- Add the 'disk' folder first
+    table.insert(disks, 1, "/disk/")
+
+    for _, disk_path in ipairs(disks) do
+        for _, file_name in ipairs(fs.list(disk_path)) do
+            if file_name:match("^" .. base_name .. "_chunk%d+%.txt$") then
+                fs.delete(disk_path .. file_name)
+            end
+        end
+    end
+end
+
+-- Save a table to disk(s), fragmenting it dynamically with one chunk per disk
 function data.save_large_file_to_disks(filename, table_data)
     local base_name = filename:gsub("%.txt$", "")  -- Strip ".txt" extension if present
+    remove_old_chunks(base_name)  -- Remove old chunks first
+
     local serialized_content = textutils.serialize(table_data)  -- Serialize the table
     local lines = {}
 
@@ -41,66 +65,27 @@ function data.save_large_file_to_disks(filename, table_data)
     local disks = {}  -- Collect available disks
     for _, entry in ipairs(fs.list("/")) do
         if entry:match("^disk%d+$") or entry:match("^disk$") then
-            table.insert(disks, "/" .. entry .. "/")
+            local disk_path = "/" .. entry .. "/"
+            if #fs.list(disk_path) == 0 then  -- Only consider empty disks
+                table.insert(disks, disk_path)
+            end
         end
     end
 
-    -- Add the 'disk' folder first
-    table.insert(disks, 1, "/disk/")
+    -- Add the 'disk' folder first, if empty
+    if #fs.list("/disk/") == 0 then
+        table.insert(disks, 1, "/disk/")
+    end
 
     if #disks == 0 then
-        error("No disks found.")
+        error("No suitable empty disks found.")
     end
 
     local line_index = 1
     local chunk_index = 1
-    local disk_index = 1
-    local total_chunks_needed = 0
 
-    -- Calculate the number of chunks needed for the new content
-    while line_index <= #lines and disk_index <= #disks do
-        local disk_path = disks[disk_index]
-        local free_space = fs.getFreeSpace(disk_path)
-
-        if free_space > RESERVED_SPACE then
-            free_space = free_space - RESERVED_SPACE
-
-            local current_chunk = ""
-            local current_size = 0
-
-            while line_index <= #lines and (current_size + #lines[line_index] + 1) <= free_space do
-                current_chunk = current_chunk .. (current_chunk == "" and "" or "\n") .. lines[line_index]
-                current_size = current_size + #lines[line_index] + 1
-                line_index = line_index + 1
-            end
-
-            total_chunks_needed = total_chunks_needed + 1
-            disk_index = disk_index + 1
-        else
-            disk_index = disk_index + 1
-            if disk_index > #disks then
-                error("Not enough space across all disks to save the file.")
-            end
-        end
-    end
-
-    -- Remove old chunks if fewer chunks are needed
-    local current_chunk_index = 1
+    -- Write chunks to disks
     for _, disk_path in ipairs(disks) do
-        local chunk_filename = disk_path .. base_name .. "_chunk" .. current_chunk_index .. ".txt"
-        if fs.exists(chunk_filename) and current_chunk_index > total_chunks_needed then
-            fs.delete(chunk_filename)
-        end
-        current_chunk_index = current_chunk_index + 1
-    end
-
-    -- Write the new chunks
-    disk_index = 1
-    line_index = 1
-    chunk_index = 1
-
-    while line_index <= #lines and disk_index <= #disks do
-        local disk_path = disks[disk_index]
         local free_space = fs.getFreeSpace(disk_path)
 
         if free_space > RESERVED_SPACE then
@@ -109,28 +94,35 @@ function data.save_large_file_to_disks(filename, table_data)
             local current_chunk = ""
             local current_size = 0
 
+            -- Build the chunk content
             while line_index <= #lines and (current_size + #lines[line_index] + 1) <= free_space do
                 current_chunk = current_chunk .. (current_chunk == "" and "" or "\n") .. lines[line_index]
                 current_size = current_size + #lines[line_index] + 1
                 line_index = line_index + 1
             end
 
-            local chunk_filename = disk_path .. base_name .. "_chunk" .. chunk_index .. ".txt"
-            local file = fs.open(chunk_filename, "w")
-            if file then
-                file.write(current_chunk)
-                file.close()
-                chunk_index = chunk_index + 1
-                disk_index = disk_index + 1
-            else
-                error("Failed to write chunk to disk: " .. disk_path)
+            if current_chunk ~= "" then
+                -- Write the chunk to a file
+                local chunk_filename = disk_path .. base_name .. "_chunk" .. chunk_index .. ".txt"
+                local file = fs.open(chunk_filename, "w")
+                if file then
+                    file.write(current_chunk)
+                    file.close()
+                    chunk_index = chunk_index + 1
+                else
+                    error("Failed to write chunk to disk: " .. disk_path)
+                end
             end
-        else
-            disk_index = disk_index + 1
-            if disk_index > #disks then
-                error("Not enough space across all disks to save the file.")
+
+            -- Stop after writing one chunk per disk
+            if line_index > #lines then
+                break
             end
         end
+    end
+
+    if line_index <= #lines then
+        error("Not enough space across all disks to save the file.")
     end
 end
 

@@ -33,8 +33,6 @@ for _, file in ipairs(files) do
     end
 end
 
-io.open("stockpile/database/content.txt", 'w'):write("{}"):close()
-io.open("stockpile/database/inventories.txt", 'w'):write("{}"):close()
 io.open("stockpile/logs/logs.txt", 'w'):close()
 
 local write_startup

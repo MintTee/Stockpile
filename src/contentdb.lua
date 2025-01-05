@@ -100,40 +100,8 @@ end
 
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
 
---Function to add to the unit "undefined" inventories which are not part of other user defined units.
-local function update_undefined_invs(inv_peripherals)
-    if not inventories["units"] then inventories["units"] = {} end
-    inventories["units"]["undefined"] = {}
-
-    for _, inv_peri in ipairs(inv_peripherals) do
-        for unit, inv_table in pairs(inventories) do
-            if unit ~= "total_count" then
-                if table_utils.contains_value(inv_table, inv_peri) == false then
-                    table.insert(inventories["units"]["undefined"], inv_peri)
-                end
-            end
-        end
-    end
-
-    contentdb.unit.counts_towards_total(false, "undefined")
-    data.save_large_file_to_disks("inventories.txt", inventories)
-end
-
--- Returns all the "inventory" type peripherals found in the stockpile server's network.
-function contentdb.list_all_inventories()
-    logger("Debug", "list_all_inventories", "function called")
-    
-    local connected_peripherals = peripheral.getNames()
-    local inv_peripherals = filter_inventories(connected_peripherals)
-    table.sort(inv_peripherals)
-
-    update_undefined_invs(inv_peripherals)
-
-    return inv_peripherals
-end
-
 -- Filters and returns only "inventory" type peripherals
-function filter_inventories(connected_peripherals)
+local function filter_inventories(connected_peripherals)
     local inv_peripherals = {}
     for _, peri in ipairs(connected_peripherals) do
         if peripheral.hasType(peri, "inventory") then
@@ -143,77 +111,99 @@ function filter_inventories(connected_peripherals)
     return inv_peripherals
 end
 
---///////////////////////////////////////////////////////////////////////////////////////////////////////
+-- Returns all the "inventory" type peripherals found in the stockpile server's network.
+local function list_all_inventories()
+    logger("Debug", "list_all_inventories", "function called")
+    
+    local connected_peripherals = peripheral.getNames()
+    local inv_peripherals = filter_inventories(connected_peripherals)
+    table.sort(inv_peripherals)
+    return inv_peripherals
+end
 
-function contentdb.unit.counts_towards_total(counts_towards_total, unit_name)
-    if not inventories["total_count"] then
-        inventories["total_count"] = {}
+--Function to add to the unit "undefined" inventories which are not part of other user defined units.
+local function update_undefined_invs()
+    local inv_peripherals = list_all_inventories()
+
+    units["undefined"] = {}
+    if not units["undefined"]["total_count"] then units["undefined"]["total_count"] = false end
+
+    for _, inv_peri in ipairs(inv_peripherals) do
+        for unit, inv_table in pairs(units) do
+            if table_utils.contains_value(inv_table, inv_peri) == false then
+                table.insert(units["undefined"], inv_peri)
+            end
+        end
     end
+    data.save_large_file_to_disks("units.txt", units)
+end
 
-    if not inventories["units"][unit_name] then
-        return "Error : unit.counts_towards_total : "..unit_name.." does not yet exist. Use the API method 'unit' to create it."
+local function remove_from_all(invs)
+    for unit, _ in pairs(units) do
+        contentdb.unit.remove(unit, invs)
     end
+end
 
-    --Sets the count towards total parameter in the inventories table. Just needs the unit name and a boolean.
-    for _, inv in ipairs(inventories["units"][unit_name]) do
-        inventories["total_count"][inv] = counts_towards_total
-    end
+function contentdb.unit.counts_towards_total(unit_name, counts_towards_total)
+    if not units[unit_name] then return "Error : unit.counts_towards_total : "..unit_name.." does not yet exist. Use the API method 'unit.set' to create it." end
+    
+    units[unit_name]["total_count"] = counts_towards_total
 
-    data.save_large_file_to_disks("inventories.txt", inventories)
+    data.save_large_file_to_disks("units.txt", units)    
     return "Info : unit.counts_towards_total : Done"
 end
 
-function contentdb.unit.add(invs, unit_name)
-    if not inventories["units"] then inventories["units"] = {} end
-    if not inventories["units"][unit_name] then inventories["units"][unit_name] = {} end
+function contentdb.unit.add(unit_name, invs)
+    remove_from_all(invs)
+    if not units[unit_name] then return contentdb.unit.set(unit_name, invs) end
 
     for _, inv in ipairs(invs) do
-        if table_utils.contains_value(inventories["units"][unit_name], inv) == false then
-            table.insert(inventories["units"][unit_name], inv)
-            logger("Info", "contentdb.unit.add", "Added inventory", inv.." from unit "..unit_name)
+        if table_utils.contains_value(units[unit_name], inv) == false then
+            table.insert(units[unit_name], inv)
+            logger("Debug", "contentdb.unit.add", "Added inventory", inv.." from unit "..unit_name)
         end
     end
-    data.save_large_file_to_disks("inventories.txt", inventories)
+    data.save_large_file_to_disks("units.txt", units)
     return "Info : unit.add : Done."
 end
 
-function contentdb.unit.remove(invs, unit_name)
-
-    if not inventories["units"] or not inventories["units"][unit_name] then
-        return "Info : unit.remove : "..unit_name.." does not exist."
-    end
+function contentdb.unit.remove(unit_name, invs)
+    if not units or not units[unit_name] then return "Info : unit.remove : "..unit_name.." does not exist." end
 
     for _, inv in ipairs(invs) do
-        for k, v in pairs(inventories["units"][unit_name]) do
+        for k, v in pairs(units[unit_name]) do
             if v == inv then
-                table.remove(inventories["units"][unit_name], k)
+                table.remove(units[unit_name], k)
                 logger("Info", "contentdb.unit.remove", "Removed inventory", inv.." from unit "..unit_name)
             end
         end
     end
 
-    if #inventories["units"][unit_name] == 0 then
-        inventories["units"][unit_name] = nil
+    if units[unit_name][1] == 0 then
+        units[unit_name] = nil
     end
 
-    data.save_large_file_to_disks("inventories.txt", inventories)
+    data.save_large_file_to_disks("units.txt", units)
     return "Info : unit.remove : Done."
 end
 
-function contentdb.unit.set(invs, unit_name)
+function contentdb.unit.set(unit_name, invs)
     if not invs or invs[1] == nil then
-        inventories["units"][unit_name] = nil
+        units[unit_name] = nil
         logger("Info", "contentdb.unit.set", "Successfully removed unit", unit_name)
     else
-        inventories["units"][unit_name] = invs
+        remove_from_all(invs)
+        units[unit_name] = invs
+        if not units[unit_name]["total_count"] then units[unit_name]["total_count"] = true end
         logger("Info", "contentdb.unit.set", "Successfully set unit inventories", unit_name)
     end
-    data.save_large_file_to_disks("inventories.txt", inventories)
+    data.save_large_file_to_disks("units.txt", units)
     return "Info : unit.set : Done."
 end
 
 function contentdb.unit.get()
-    return inventories
+    update_undefined_invs()
+    return units
 end
 
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,9 +289,13 @@ end
 -- Helper function to calculate the total quantity for an item
 local function calculate_total(item, qty, difference, inv_id)
     local total = table_utils.try_get_value(content, {"item_index", item, "total"}) or 0
-    if inventories["total_count"][inv_id] == true then
-        total = total + difference
+    
+    for unit, unit_table in pairs(units) do
+        if table_utils.contains_value(unit_table, inv_id) == true and units[unit]["total_count"] == true then
+            total = total + difference
+        end
     end
+
     return total < 0 and 0 or total
 end
 
@@ -386,7 +380,7 @@ end
 function contentdb.usage()
     local all_slots, used_slots = 0, 0
 
-    for _, inv in ipairs(inventories.storage) do
+    for _, inv in ipairs(units.storage) do
         all_slots = all_slots + (table_utils.try_get_value(content, {"inv_index", inv, "size"}) or 0)
     end
 

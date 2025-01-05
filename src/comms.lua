@@ -6,15 +6,15 @@ require("/stockpile/var/globals")
 -- Environment for the modules
 local default_env = {
     move_item = move_item,
-    --check = contentdb.check, --DEPRECATED FUNCTION
+    --check = contentdb.check, --DEPRECATED METHOD
     scan = contentdb.scan,
-    list_all_inventories = contentdb.list_all_inventories,
+    --list_all_inventories = contentdb.list_all_inventories, --DEPRECATED METHOD
     search = contentdb.search,
     usage = contentdb.usage,
     unit = contentdb.unit,
     get_nbt = contentdb.get_nbt,
     get_content = contentdb.get_content,
-    inventories = inventories,
+    units = units,
 }
 
 local comms = {}
@@ -106,9 +106,9 @@ function sanitize_input(user_input)
     -- Define the keys from the default_env table
     local valid_keys = {
         ["move_item" ]= true,
-        --check = true, --DEPRECATED FUNCTION
+        --check = true, --DEPRECATED METHOD
         ["scan"] = true,
-        ["list_all_inventories"] = true,
+        --["list_all_inventories"] = true, --DEPRECATED METHOD
         ["search"] = true,
         ["usage"] = true,
         ["unit.add"] = true,
@@ -116,7 +116,6 @@ function sanitize_input(user_input)
         ["unit.set"] = true,
         ["unit.counts_towards_total"] = true,
         ["unit.get"] = true,
-        ["inventories"] = true,
         ["get_nbt"] = true,
         ["get_content"] = true,
     }
