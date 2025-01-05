@@ -158,17 +158,6 @@ Queries the nbt data of the provided item ID.
 
 ---
 
-## list_all_inventories
-
-`list_all_inventories()`
-
-Returns a list of all the connected peripherals of the "inventory" type found in the server's network. All the found inventories which are not already part of a user defined unit will be added to the "undefined" unit by default (doesn't count towards total).
-
-**Returns**
-1. table - List of all connected inventories.
-
----
-
 ## get_content
 
 `get_content()`
@@ -184,23 +173,24 @@ Returns the "content" table, representing all of the current server's storage co
 
 **Functions to manipulate what we call "units", which are essentially groups of inventories.**
 
-`unit.set(invs, unit_name)`
+`unit.set(unit_name, invs)`
 
 Sets the unit of the specified name to the provided inventory list. If invs = {}, the unit will be removed.
 
-`unit.add(invs, unit_name)`
+`unit.add(unit_name, invs)`
 
 Adds the provided inventory list to the specified unit.
 
-`unit.remove(invs, unit_name)`
+`unit.remove(unit_name, invs)`
 
 Removes the provided inventory list from the specified unit.
 
 `unit.get()`
 
 Returns the entire "inventories" table, itself containing the subtables of each units and their compositon. "inventories" also contains the "total_count" table, indicating which inventory should be counted towards the total of items.
+Auto updates the inventories peripheral in the server's network to find if new ones were added.
 
-`unit.counts_towards_total(counts_towards_total, unit_name)`
+`unit.counts_towards_total(unit_name, counts_towards_total)`
 
 Tells stockpile to count the content of the specified unit towards in the total amount of item in the database.
 Use this method to prevent items in ouputs or inputs to be visible by the search() method for example.
