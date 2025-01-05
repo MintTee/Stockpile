@@ -187,7 +187,7 @@ Removes the provided inventory list from the specified unit.
 
 `unit.get()`
 
-Returns the entire "inventories" table, itself containing the subtables of each units and their compositon. "inventories" also contains the "total_count" table, indicating which inventory should be counted towards the total of items.
+Returns the entire "units" table, itself containing the subtables of each units and their compositon.
 Auto updates the inventories peripheral in the server's network to find if new ones were added.
 
 `unit.counts_towards_total(unit_name, counts_towards_total)`
