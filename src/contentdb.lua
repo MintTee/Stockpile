@@ -135,7 +135,7 @@ local function update_undefined_invs()
             end
         end
     end
-    data.save_large_file_to_disks("units.txt", units)
+    data.save("/stockpile/config/units.txt", units)
 end
 
 local function remove_from_all(invs)
@@ -149,7 +149,7 @@ function contentdb.unit.counts_towards_total(unit_name, counts_towards_total)
     
     units[unit_name]["total_count"] = counts_towards_total
 
-    data.save_large_file_to_disks("units.txt", units)    
+    data.save("/stockpile/config/units.txt", units)
     return "Info : unit.counts_towards_total : Done"
 end
 
@@ -163,7 +163,7 @@ function contentdb.unit.add(unit_name, invs)
             logger("Debug", "contentdb.unit.add", "Added inventory", inv.." from unit "..unit_name)
         end
     end
-    data.save_large_file_to_disks("units.txt", units)
+    data.save("/stockpile/config/units.txt", units)
     return "Info : unit.add : Done."
 end
 
@@ -183,7 +183,7 @@ function contentdb.unit.remove(unit_name, invs)
         units[unit_name] = nil
     end
 
-    data.save_large_file_to_disks("units.txt", units)
+    data.save("/stockpile/config/units.txt", units)
     return "Info : unit.remove : Done."
 end
 
@@ -197,7 +197,7 @@ function contentdb.unit.set(unit_name, invs)
         if not units[unit_name]["total_count"] then units[unit_name]["total_count"] = true end
         logger("Info", "contentdb.unit.set", "Successfully set unit inventories", unit_name)
     end
-    data.save_large_file_to_disks("units.txt", units)
+    data.save("/stockpile/config/units.txt", units)
     return "Info : unit.set : Done."
 end
 

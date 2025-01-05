@@ -34,6 +34,7 @@ for _, file in ipairs(files) do
 end
 
 io.open("stockpile/logs/logs.txt", 'w'):close()
+io.open("stockpile/config/units.txt", 'w'):write({}):close()
 
 local write_startup
 while write_startup == nil do

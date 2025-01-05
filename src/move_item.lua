@@ -54,7 +54,7 @@ function move_item(from_invs, to_invs, item, qty, nbt_regex_filter)
 
     logger("Debug", "move_item", "Calling the move_list function")
     local result = move_list(to_move, to_invs)
-    data.save_large_file_to_disks("content", content)
+    data.save_large_file_to_disks("content.txt", content)
     return result
 end
 
