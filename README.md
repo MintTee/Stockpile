@@ -31,7 +31,7 @@ If you encounter any issue during the installation process, please report it [he
 
 ## Roadmap
 
-- **Fluid support:** Adding a compete an easy to use fluid manager to Stockpile.
+- **Fluid support:** Adding fluid support to Stockpile.
 - **GUI Survival Client** An easy to use comprehensive GUI Client to search and query items from Stockpile with search features similar to JEI, REI or EMI.  
 - **SIGILS Compat** A simple program to make interfacing Stockpile with [SIGILS](https://github.com/fechan/SIGILS) easy.
 - **Auto schematic material list** Feature to automatically pull every item requiered from a schematic material list.
