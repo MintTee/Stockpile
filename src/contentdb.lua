@@ -129,12 +129,20 @@ local function update_undefined_invs()
     if not units["undefined"]["total_count"] then units["undefined"]["total_count"] = false end
 
     for _, inv_peri in ipairs(inv_peripherals) do
-        for unit, inv_table in pairs(units) do
-            if table_utils.contains_value(inv_table, inv_peri) == false then
-                table.insert(units["undefined"], inv_peri)
+        local should_add = true
+
+        for unit, unit_table in pairs(units) do
+            if table_utils.contains_value(unit_table, inv_peri) == true then
+                should_add = false
             end
         end
+        
+        if should_add == true then
+            table.insert(units["undefined"], inv_peri)
+        end
     end
+
+    
     data.save("/stockpile/config/units.txt", units)
 end
 
@@ -179,16 +187,12 @@ function contentdb.unit.remove(unit_name, invs)
         end
     end
 
-    if units[unit_name][1] == 0 then
-        units[unit_name] = nil
-    end
-
     data.save("/stockpile/config/units.txt", units)
     return "Info : unit.remove : Done."
 end
 
 function contentdb.unit.set(unit_name, invs)
-    if not invs or invs[1] == nil then
+    if not invs then
         units[unit_name] = nil
         logger("Info", "contentdb.unit.set", "Successfully removed unit", unit_name)
     else
