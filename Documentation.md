@@ -1,5 +1,6 @@
 # Stockpile API Documentation
 
+[For more informations regarding Stockpile's data management and floppy disks go here](#data-and-floppy-disks)
 
 ## How to use the API
 
@@ -161,8 +162,7 @@ Queries the nbt data of the provided item ID.
 
 `list_all_inventories()`
 
-Returns a list of all the connected peripherals of the "inventory" type found in the server's network.
-You process that list in order to easily configure units later on.
+Returns a list of all the connected peripherals of the "inventory" type found in the server's network. All the found inventories which are not already part of a user defined unit will be added to the "undefined" unit by default (doesn't count towards total).
 
 **Returns**
 1. table - List of all connected inventories.
@@ -215,3 +215,21 @@ Use this method to prevent items in ouputs or inputs to be visible by the search
 
 **Returns**
 1. string - `Info : unit.subfunction : Done`
+
+
+## Data and floppy disks
+
+Stockpile optimizes database queries and item transfers by avoiding unnecessary rescans of inventory content. Instead, it internally represents storage data, which can grow large depending on your storage size. To handle chunk loading, unloading, or computer shutdowns, this data is stored persistently as a text file on disk.
+
+CC: Tweaked limits storage to 1 MB on computers and 125 KB on floppy disks. Stockpile uses about 2 KB to represent 1,000 items.
+
+For example:
+
+    A storage system for 500,000 items (~145 full double chests) requires 500k / 125k * 2 = 8 floppy disks.
+    A 10 million item storage needs ~160 floppy disks.
+
+Keep in mind those numbers are estimates. Adjust the amount of disks used according to your needs. There is no harm in adding a little extra.
+You can count ~1MB of real disk space used on your machine or server per million item handled by Stockpile.
+
+To connect floppy disks, place disk drives in your world and insert floppy disks in them. Use networking cables and wired modems to connect them to the Stockpile computer. Make sure to right-click the modems to connect the drives to the network.
+Stockpile should now be able to use the floppy disks as data storage space.

@@ -94,11 +94,30 @@ function contentdb.scan(invs)
     end
     queue.run()
 
-    data.save("/stockpile/database/content.txt", content)
+    data.save_large_file_to_disks("content", content)
     return "Info : scan : Done"
 end
 
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+--Function to add to the unit "undefined" inventories which are not part of other user defined units.
+local function update_undefined_invs(inv_peripherals)
+    if not inventories["units"] then inventories["units"] = {} end
+    inventories["units"]["undefined"] = {}
+
+    for _, inv_peri in ipairs(inv_peripherals) do
+        for unit, inv_table in pairs(inventories) do
+            if unit ~= "total_count" then
+                if table_utils.contains_value(inv_table, inv_peri) == false then
+                    table.insert(inventories["units"]["undefined"], inv_peri)
+                end
+            end
+        end
+    end
+
+    contentdb.unit.counts_towards_total(false, "undefined")
+    data.save_large_file_to_disks("inventories.txt", inventories)
+end
 
 -- Returns all the "inventory" type peripherals found in the stockpile server's network.
 function contentdb.list_all_inventories()
@@ -107,6 +126,8 @@ function contentdb.list_all_inventories()
     local connected_peripherals = peripheral.getNames()
     local inv_peripherals = filter_inventories(connected_peripherals)
     table.sort(inv_peripherals)
+
+    update_undefined_invs(inv_peripherals)
 
     return inv_peripherals
 end
@@ -125,78 +146,69 @@ end
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function contentdb.unit.counts_towards_total(counts_towards_total, unit_name)
-
-    local function inv_counts_towards_total(inv, boolean)
-        if not inventories["total_count"] then
-            inventories["total_count"] = {}
-        end
-        inventories["total_count"][inv] = boolean
+    if not inventories["total_count"] then
+        inventories["total_count"] = {}
     end
 
-    if unit_name == "total_count" then
-        return "Error : unit.counts_towards_total : unit_name arg can't be 'total_count' because of a naming conflict."
-    end
-    if not inventories[unit_name] then
-        return "Error : unit.counts_towards_total : unit_name does not yet exist. Use the API method 'unit' to create it."
+    if not inventories["units"][unit_name] then
+        return "Error : unit.counts_towards_total : "..unit_name.." does not yet exist. Use the API method 'unit' to create it."
     end
 
     --Sets the count towards total parameter in the inventories table. Just needs the unit name and a boolean.
-    for _, inv in ipairs(inventories[unit_name]) do
-        inv_counts_towards_total(inv, counts_towards_total)
+    for _, inv in ipairs(inventories["units"][unit_name]) do
+        inventories["total_count"][inv] = counts_towards_total
     end
 
-    data.save("/stockpile/database/inventories.txt", inventories)
+    data.save_large_file_to_disks("inventories.txt", inventories)
     return "Info : unit.counts_towards_total : Done"
 end
 
 function contentdb.unit.add(invs, unit_name)
-
-    if not inventories[unit_name] then
-        inventories[unit_name] = {}
-    end
+    if not inventories["units"] then inventories["units"] = {} end
+    if not inventories["units"][unit_name] then inventories["units"][unit_name] = {} end
 
     for _, inv in ipairs(invs) do
-        if table_utils.contains_value(inventories[unit_name], inv) == false then
-            table.insert(inventories[unit_name], inv)
+        if table_utils.contains_value(inventories["units"][unit_name], inv) == false then
+            table.insert(inventories["units"][unit_name], inv)
             logger("Info", "contentdb.unit.add", "Added inventory", inv.." from unit "..unit_name)
         end
     end
-    data.save("/stockpile/database/inventories.txt", inventories)
+    data.save_large_file_to_disks("inventories.txt", inventories)
     return "Info : unit.add : Done."
 end
 
 function contentdb.unit.remove(invs, unit_name)
 
-    if not inventories[unit_name] then
-        return "Info : unit.remove : unit_name does not exist."
+    if not inventories["units"] or not inventories["units"][unit_name] then
+        return "Info : unit.remove : "..unit_name.." does not exist."
     end
 
     for _, inv in ipairs(invs) do
-        for k, v in pairs(inventories[unit_name]) do
+        for k, v in pairs(inventories["units"][unit_name]) do
             if v == inv then
-                table.remove(inventories[unit_name], k)
+                table.remove(inventories["units"][unit_name], k)
                 logger("Info", "contentdb.unit.remove", "Removed inventory", inv.." from unit "..unit_name)
             end
         end
     end
 
-    if #inventories[unit_name] == 0 then
-        inventories[unit_name] = nil
+    if #inventories["units"][unit_name] == 0 then
+        inventories["units"][unit_name] = nil
     end
 
-    data.save("/stockpile/database/inventories.txt", inventories)
+    data.save_large_file_to_disks("inventories.txt", inventories)
     return "Info : unit.remove : Done."
 end
 
 function contentdb.unit.set(invs, unit_name)
     if not invs or invs[1] == nil then
-        inventories[unit_name] = nil
+        inventories["units"][unit_name] = nil
         logger("Info", "contentdb.unit.set", "Successfully removed unit", unit_name)
     else
-        inventories[unit_name] = invs
+        inventories["units"][unit_name] = invs
         logger("Info", "contentdb.unit.set", "Successfully set unit inventories", unit_name)
     end
-    data.save("/stockpile/database/inventories.txt", inventories)
+    data.save_large_file_to_disks("inventories.txt", inventories)
     return "Info : unit.set : Done."
 end
 

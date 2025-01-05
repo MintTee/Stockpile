@@ -3,8 +3,7 @@
 --Inventories is a table which is used to specify inventory groups to handle item transfer between them.
 local data = require("/stockpile/src/data_manager")
 
-content = data.load("/stockpile/database/content.txt")
-inventories = data.load("/stockpile/database/inventories.txt")
-client_id_whitelist = data.load("/stockpile/config/client_id_whitelist.txt")
+content = data.load_large_file_from_disks("content.txt") or {["item_index"] = {}, ["inv_index"] = {}}
+inventories = data.load_large_file_from_disks("inventories.txt") or {["units"] = {}, ["total_count"] = {}}
 logs = data.load("/stockpile/logs/logs.txt") or {}
 logger_config = data.load("/stockpile/config/logger_config.txt")
