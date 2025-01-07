@@ -8,6 +8,7 @@ local files = {
     "src/move_item.lua",
     "src/queue.lua",
     "src/table_utils.lua",
+    "src/autoscan.lua"
     "var/globals.lua",
     "LICENSE",
     "README.md",
