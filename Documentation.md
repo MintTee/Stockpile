@@ -64,10 +64,10 @@ You can combine the three filters for fine control over the moved item parameter
 **Examples**
 
 `move_item(inventories.input, inventories.storage)`
-- Transfers all the items from the inventory group "input" to the inventory group "storage".
+- Transfers all the items from the inventory group(unit) "input" to the inventory unit "storage".
 
 `move_item(inventories.storage, inventories.output, "arrow")`
-- Transfers all item matching "arrow" in their id (minecraft:arrow, minecraft:tipped_arrow...) from the inventory group "storage" to the inventory group "output".
+- Transfers all item matching "arrow" in their id (minecraft:arrow, minecraft:tipped_arrow...) from the inventory unit "storage" to the inventory unit "output".
 
 `move_item({"minecraft:chest_20", "minecraft:chest_21"}, {"minecraft:barrel_15"}, _, 10, "Sharpness")`
 - Transfers up to 10 items matching "Sharpness" in their nbt from chest #20 and #21 to barrel #15.
@@ -76,8 +76,6 @@ You can combine the three filters for fine control over the moved item parameter
 
 ## search
 `search([item_filter], [nbt_filter])`
-`scan(inventories)`
-
 
 1. `item_filter` : string - Regex filter for the item ids. If an item id matches this filter, it will be added to the returned result list.
 2. `nbt_filter` : string - Regex filter for the item ids. If an item's serialized nbt data matches this filter, it will be added to the returned result list.
@@ -190,7 +188,7 @@ Removes the provided inventory list from the specified unit.
 Returns the entire "units" table, itself containing the subtables of each units and their compositon.
 Auto updates the inventories peripheral in the server's network to find if new ones were added.
 
-`unit.counts_towards_total(unit_name, counts_towards_total)`
+`unit.is_io(unit_name, is_io)`
 
 Tells stockpile to count the content of the specified unit towards in the total amount of item in the database.
 Use this method to prevent items in ouputs or inputs to be visible by the search() method for example.
@@ -201,7 +199,7 @@ Use this method to prevent items in ouputs or inputs to be visible by the search
 
 2. `invs` : table - A list of all the inventories you would like to change the states of.
 
-3. `counts_towards_total` : boolean - true = will count towards the total, false = will ignored those inventories when counting the total.
+3. `is_io` : boolean - true = will count towards the total, false = will ignored those inventories when counting the total.
 
 **Returns**
 1. string - `Info : unit.subfunction : Done`

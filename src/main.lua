@@ -2,6 +2,7 @@ local comms = require("/stockpile/src/comms")
 local logger = require("/stockpile/src/logger")
 local data = require("/stockpile/src/data_manager")
 local contentdb = require("/stockpile/src/contentdb")
+local autoscan = require("/stockpile/src/autoscan")
 require("/stockpile/var/globals")
 
 function main()
@@ -25,10 +26,16 @@ function main()
     local max_capacity_storage = #disks * 125 / 2 * 1000
     print(#disks.." floppy disks were found in the network, Stockpile can currently store the data of ~ "..max_capacity_storage.." items. \n")
     print("Opened all modems in the network.\n")
-
+    
     logger("Info", "main", "main function called", "Stockpile initializing... Listening for client command")
     if units == {} then contentdb.unit.get() end
-    if comms.open_all_modems() == true then comms.wait_for_command() end
+
+    if comms.open_all_modems() == true then
+        parallel.waitForAny(
+            comms.wait_for_command,
+            autoscan
+        )
+    end
 end
 
 main()

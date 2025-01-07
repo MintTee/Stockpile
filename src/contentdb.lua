@@ -126,7 +126,7 @@ local function update_undefined_invs()
     local inv_peripherals = list_all_inventories()
 
     units["undefined"] = {}
-    if not units["undefined"]["total_count"] then units["undefined"]["total_count"] = false end
+    if not units["undefined"]["io"] then units["undefined"]["io"] = false end
 
     for _, inv_peri in ipairs(inv_peripherals) do
         local should_add = true
@@ -152,13 +152,13 @@ local function remove_from_all(invs)
     end
 end
 
-function contentdb.unit.counts_towards_total(unit_name, counts_towards_total)
-    if not units[unit_name] then return "Error : unit.counts_towards_total : "..unit_name.." does not yet exist. Use the API method 'unit.set' to create it." end
+function contentdb.unit.is_io(unit_name, is_io)
+    if not units[unit_name] then return "Error : unit.is_io : "..unit_name.." does not yet exist. Use the API method 'unit.set' to create it." end
     
-    units[unit_name]["total_count"] = counts_towards_total
+    units[unit_name]["io"] = is_io
 
     data.save("/stockpile/config/units.txt", units)
-    return "Info : unit.counts_towards_total : Done"
+    return "Info : unit.is_io : Done"
 end
 
 function contentdb.unit.add(unit_name, invs)
@@ -198,7 +198,7 @@ function contentdb.unit.set(unit_name, invs)
     else
         remove_from_all(invs)
         units[unit_name] = invs
-        if not units[unit_name]["total_count"] then units[unit_name]["total_count"] = true end
+        if not units[unit_name]["io"] then units[unit_name]["io"] = false end
         logger("Info", "contentdb.unit.set", "Successfully set unit inventories", unit_name)
     end
     data.save("/stockpile/config/units.txt", units)
@@ -291,15 +291,17 @@ end
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -- Helper function to calculate the total quantity for an item
-local function calculate_total(item, qty, difference, inv_id)
+local function calculate_total(item, qty, difference)
     local total = table_utils.try_get_value(content, {"item_index", item, "total"}) or 0
     
-    for unit, unit_table in pairs(units) do
-        if table_utils.contains_value(unit_table, inv_id) == true and units[unit]["total_count"] == true then
+    --[[for unit, unit_table in pairs(units) do
+        if table_utils.contains_value(unit_table, inv_id) == true and units[unit]["io"] == true then
             total = total + difference
         end
-    end
-
+    end]]
+    --DEPRECATED PIECE OF CODE, we are going for a new dynamic rescanning approach
+    
+    total = total + difference
     return total < 0 and 0 or total
 end
 
@@ -343,7 +345,7 @@ function contentdb.update(inv_id, slot, item, qty, stack_size, inv_size, nbt)
     local difference = qty - existing_qty
 
     -- Calculate the new total
-    local total = calculate_total(item, qty, difference, inv_id)
+    local total = calculate_total(item, qty, difference)
 
     -- Update the content tables
     update_content_tables(inv_id, slot, item, qty, stack_size, inv_size, total, nbt)

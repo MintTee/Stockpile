@@ -49,7 +49,7 @@ local function remove_old_chunks(base_name)
     end
 end
 
--- Save a table to disk(s), fragmenting it dynamically with one chunk per disk
+-- Save a table to floppy disk(s), fragmenting it dynamically with one chunk per disk
 function data.save_large_file_to_disks(filename, table_data)
     local base_name = filename:gsub("%.txt$", "")  -- Strip ".txt" extension if present
     remove_old_chunks(base_name)  -- Remove old chunks first
@@ -126,7 +126,7 @@ function data.save_large_file_to_disks(filename, table_data)
     end
 end
 
--- Load a table from disk(s) and reassemble it
+-- Load a table from floppy disk(s) and reassemble it
 function data.load_large_file_from_disks(filename)
     local base_name = filename:gsub("%.txt$", "")  -- Strip ".txt" extension if present
     local content_chunks = {}

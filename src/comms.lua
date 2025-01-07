@@ -30,25 +30,6 @@ function comms.wait_for_command()
     )
 end
 
-function comms.open_all_modems()
-    local connected_peripherals = peripheral.getNames()
-    local modem_found = false
-
-    for _, peri in ipairs(connected_peripherals) do
-        if peripheral.hasType(peri, "modem") then
-            rednet.open(peri)
-            modem_found = true
-        end
-    end
-
-    if modem_found == false then
-        logger("Warn", "open_all_modems", "No modem found in the network", "Can't communicate with other computers.")
-        return false
-    else
-        return true
-    end
-end
-
 -- Receives a command and adds it to the command queue if valid
 function receive_command(cmd_queue)
     local sender_id, message = rednet.receive()
@@ -114,7 +95,7 @@ function sanitize_input(user_input)
         ["unit.add"] = true,
         ["unit.remove"] = true,
         ["unit.set"] = true,
-        ["unit.counts_towards_total"] = true,
+        ["unit.is_io"] = true,
         ["unit.get"] = true,
         ["get_nbt"] = true,
         ["get_content"] = true,
@@ -127,6 +108,25 @@ function sanitize_input(user_input)
         return true
     else
         return false
+    end
+end
+
+function comms.open_all_modems()
+    local connected_peripherals = peripheral.getNames()
+    local modem_found = false
+
+    for _, peri in ipairs(connected_peripherals) do
+        if peripheral.hasType(peri, "modem") then
+            rednet.open(peri)
+            modem_found = true
+        end
+    end
+
+    if modem_found == false then
+        logger("Warn", "open_all_modems", "No modem found in the network", "Can't communicate with other computers.")
+        return false
+    else
+        return true
     end
 end
 
