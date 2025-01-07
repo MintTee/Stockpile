@@ -1,40 +1,41 @@
 local comms = require("/stockpile/src/comms")
 local logger = require("/stockpile/src/logger")
-local data = require("/stockpile/src/data_manager")
 local contentdb = require("/stockpile/src/contentdb")
 local autoscan = require("/stockpile/src/autoscan")
 require("/stockpile/var/globals")
 
-function main()
+local function get_floppy_disks()
+    local disks = {}
+    for _, entry in ipairs(fs.list("/")) do
+        if entry:match("^disk%d*$") then table.insert(disks, "/" .. entry .. "/") end
+    end
+    return disks
+end
+
+local function calculate_capacity(disk_count)
+    return disk_count * 125 / 2 * 1000
+end
+
+local function main()
     term.clear()
     term.setCursorPos(1, 1)
     print("[Stockpile initializing...]\n")
 
-    local disks = {}  -- Collect available disks
-    for _, entry in ipairs(fs.list("/")) do
-        if entry:match("^disk%d+$") or entry:match("^disk$") then
-            table.insert(disks, "/" .. entry .. "/")
-        end
-    end
-
+    local disks = get_floppy_disks()
     if #disks == 0 then
-        print("No disk drives containing floppy disks were found in the network.\nStockpile requires disk drives with floppy disks inside them to store large amount of data.\nOne floppy disk can hold data for ~75,000 items.\nFor example, if you plan to have a storage system with a capacity of 1 million items, you will need 16 floppy disks.")
+        print("No disk drives with floppy disks found.\nStockpile requires floppy disks for data storage (~75,000 items per disk).\nA storage system for 1 million items needs ~16 disks.")
         return
     end
 
-    --1,000 items (64 stacked) is ~2Kb of data to be stored to disk
-    local max_capacity_storage = #disks * 125 / 2 * 1000
-    print(#disks.." floppy disks were found in the network, Stockpile can currently store the data of ~ "..max_capacity_storage.." items. \n")
+    print(("%d floppy disks found. Stockpile can store data for ~%d items.\n"):format(#disks, calculate_capacity(#disks)))
+    print("Autoscan I/O running.")
     print("Opened all modems in the network.\n")
     
-    logger("Info", "main", "main function called", "Stockpile initializing... Listening for client command")
-    if units == {} then contentdb.unit.get() end
+    logger("Info", "main", "Stockpile initializing...", "Listening for client commands")
+    if next(units) == nil then contentdb.unit.get() end
 
-    if comms.open_all_modems() == true then
-        parallel.waitForAny(
-            comms.wait_for_command,
-            autoscan
-        )
+    if comms.open_all_modems() then
+        parallel.waitForAny(comms.wait_for_command, autoscan)
     end
 end
 
