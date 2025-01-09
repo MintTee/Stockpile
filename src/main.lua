@@ -23,15 +23,18 @@ local function main()
 
     local disks = get_floppy_disks()
     if #disks == 0 then
-        print("No disk drives with floppy disks found.\nStockpile requires floppy disks for data storage (~75,000 items per disk).\nA storage system for 1 million items needs ~16 disks.")
+        print("No disk drives with floppy disks found.\nStockpile requires floppy disks for data storage (~75,000 items per disk).\nA storage system for 1 million items needs ~16 disks.\n")
         return
     end
 
-    print(("%d floppy disks found. Stockpile can store data for ~%d items.\n"):format(#disks, calculate_capacity(#disks)))
+    print('Rednet : Hosting the "stockpile" protocol under the the id: '..tostring(os.computerID()).."\n")
+    rednet.host("stockpile", tostring(os.computerID()))
+
+    print(("%d floppy disks found. Stockpile can store data for ~ %d items.\n"):format(#disks, calculate_capacity(#disks)))
     print("Autoscan I/O running.")
     print("Opened all modems in the network.\n")
     
-    logger("Info", "main", "Stockpile initializing...", "Listening for client commands")
+    logger("Info", "main", "Stockpile initialized...", "Listening for client commands")
     if next(units) == nil then contentdb.unit.get() end
 
     if comms.open_all_modems() then

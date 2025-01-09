@@ -32,10 +32,10 @@ end
 
 -- Receives a command and adds it to the command queue if valid
 function receive_command(cmd_queue)
-    local sender_id, message = rednet.receive()
+    local sender_id, message = rednet.receive("stockpile")
     if type(message) ~= "string" and type(message) ~= "table" then
         logger("Error", "receive_command", "Improper command recieved", "Command needs to be a table or a string type.")
-        rednet.send(sender_id, "Improper command recieved. Command needs to be a table or a string type. Consult the API for the proper syntax.")
+        rednet.send(sender_id, "Improper command recieved. Command needs to be a table or a string type. Consult the API for the proper syntax.", "stockpile")
         return
     end
 
@@ -47,7 +47,7 @@ function receive_command(cmd_queue)
         table.insert(cmd_queue, {cmd = message[1], UUID = message[2], sender_id = sender_id})
     else
         logger("Warn", "receive_command", "Improper command recieved.", "Didn't pass the sanitization step.")
-        rednet.send(sender_id, "Improper command recieved. Consult the API for the proper syntax.")
+        rednet.send(sender_id, "Improper command recieved. Consult the API for the proper syntax.", "stockpile")
     end
 end
 
@@ -57,7 +57,7 @@ function process_command(cmd_queue)
         local cmd_info = table.remove(cmd_queue, 1)
         logger("Info", "wait_for_command", "Executing command", cmd_info.cmd)
         local result = execute_chunk(cmd_info.cmd)
-        rednet.send(cmd_info.sender_id, {result, cmd_info.UUID})
+        rednet.send(cmd_info.sender_id, {result, cmd_info.UUID}, "stockpile")
         logger("Info", "wait_for_command", "Returned results to client")
     else
         os.sleep(0.1)
@@ -111,6 +111,7 @@ function sanitize_input(user_input)
     end
 end
 
+--Opens all modems found in the network
 function comms.open_all_modems()
     local connected_peripherals = peripheral.getNames()
     local modem_found = false

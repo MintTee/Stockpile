@@ -142,7 +142,6 @@ local function update_undefined_invs()
         end
     end
 
-    
     data.save("/stockpile/config/units.txt", units)
 end
 
@@ -171,6 +170,7 @@ function contentdb.unit.add(unit_name, invs)
             logger("Debug", "contentdb.unit.add", "Added inventory", inv.." from unit "..unit_name)
         end
     end
+
     data.save("/stockpile/config/units.txt", units)
     return "Info : unit.add : Done."
 end
@@ -201,6 +201,7 @@ function contentdb.unit.set(unit_name, invs)
         if not units[unit_name]["io"] then units[unit_name]["io"] = false end
         logger("Info", "contentdb.unit.set", "Successfully set unit inventories", unit_name)
     end
+
     data.save("/stockpile/config/units.txt", units)
     return "Info : unit.set : Done."
 end
