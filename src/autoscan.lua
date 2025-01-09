@@ -26,11 +26,24 @@ end
 --and order a real rescan of the ones that changed content recently (eg. Player or hopper interaction)
 local function autoscan()
     while true do
-        os.pullEvent("timer", os.startTimer(INTERVAL))
-        for unit, data in pairs(units) do
-            if data.io then for _, inv in ipairs(data) do queue.add(scan_inv, inv) end end
+
+        local timer_id = os.startTimer(INTERVAL)
+        local event, id
+        repeat
+            event, id = os.pullEvent("timer")
+        until id == timer_id
+
+        logger("Debug", "autoscan","Running an autoscan")
+
+        for unit, _ in pairs(units) do
+            if units[unit]["io"] then
+                for _, inv in ipairs(units[unit]) do
+                    queue.add(scan_inv, inv)
+                end
+            end
         end
         queue.run()
+
         toggle = not toggle
         local to_rescan = compare_io_contents()
         if #to_rescan > 0 then contentdb.scan(to_rescan) end

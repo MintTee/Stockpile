@@ -291,17 +291,16 @@ end
 --///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 -- Helper function to calculate the total quantity for an item
-local function calculate_total(item, qty, difference)
+local function calculate_total(item, qty, difference, inv_id)
     local total = table_utils.try_get_value(content, {"item_index", item, "total"}) or 0
     
-    --[[for unit, unit_table in pairs(units) do
-        if table_utils.contains_value(unit_table, inv_id) == true and units[unit]["io"] == true then
+    for unit, _ in pairs(units) do
+        if table_utils.contains_value(units[unit], inv_id) == true and units[unit]["io"] == false then
             total = total + difference
         end
-    end]]
-    --DEPRECATED PIECE OF CODE, we are going for a new dynamic rescanning approach
+    end
     
-    total = total + difference
+    --total = total + difference
     return total < 0 and 0 or total
 end
 
@@ -345,7 +344,7 @@ function contentdb.update(inv_id, slot, item, qty, stack_size, inv_size, nbt)
     local difference = qty - existing_qty
 
     -- Calculate the new total
-    local total = calculate_total(item, qty, difference)
+    local total = calculate_total(item, qty, difference, inv_id)
 
     -- Update the content tables
     update_content_tables(inv_id, slot, item, qty, stack_size, inv_size, total, nbt)
@@ -408,7 +407,7 @@ function contentdb.search(name_search, nbt_search)
         local nbt_data = nbt_search and textutils.serialize(item_data["nbt"])
 
         if string.match(item_name, name_search) and (not nbt_search or string.match(nbt_data, nbt_search)) then
-            result[item_name] = table_utils.try_get_value(content, {"item_index", item_name, "total"}) or 0
+            result[item_name] = table_utils.try_get_value(content, {"item_index", item_name, "total"})
         end
     end
 

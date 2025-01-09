@@ -105,7 +105,7 @@ function move_list(to_move, to_invs)
                 local qty_to_move = math.min(from_qty, difference)
                 
                 from_qty = from_qty - qty_to_move
-                
+
                 queue.add(push_items, from_inv, from_slot, part_inv, part_slot, qty_to_move)  --Queues item transfer
 
                 contentdb.update(from_inv, from_slot, from_item, real_qty - qty_to_move)
@@ -124,6 +124,7 @@ end
 
 --Moves the accually physical item in game. This functions is parallelized using the coroutine queue.
 function push_items(from_inv, from_slot, to_inv, to_slot, qty)
+    logger("Debug","push_items","function called")
     peripheral.call(from_inv, "pushItems", to_inv, from_slot, qty, to_slot)
 end
 
