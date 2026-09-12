@@ -9,9 +9,9 @@ local app = {
 
 -- Load groups from disk
 function app:loadGroups()
-    local data = dofile("/stockpile_client/src/data.lua")   -- note the .lua extension
+    local data = dofile("/stockpile_client/src/data.lua")
     local s = data.load("/stockpile_client/config/groups.txt")
-    self.groups = textutils.unserialize(s) or { all = {} }
+    self.groups = textutils.unserialize(s) or { all = {} }   -- full replace!
 end
 
 -- Save groups to disk

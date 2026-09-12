@@ -144,12 +144,17 @@ comms.getContentAsync(app, function(result)
         print("Failed to fetch content: " .. (result and result.detail or "timeout"))
         return
     end
+
+    app:loadGroups()
+
     comms.listAllInventoriesAsync(app, function(result)
         if not result or result.status ~= "done" then
             print("Failed to list inventories: " .. (result and result.detail or "timeout"))
             return
         end
-        app:loadGroups()
+
+        app:saveGroups()
+
         build_ui()
     end)
 end)
