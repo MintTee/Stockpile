@@ -6,13 +6,6 @@ local REPO   = "MintTee/Stockpile"
 local BRANCH = "main"
 local BASE   = "https://raw.githubusercontent.com/" .. REPO .. "/refs/heads/" .. BRANCH .. "/"
 
--- ROOT is set after the user picks client or server. The two sides
--- install into separate folders so both can coexist on the same
--- computer without collision, and so the internal `require` paths
--- in the code (/stockpile_client/…, /stockpile_server/…) resolve
--- correctly without any rewriting.
-local ROOT
-
 -- =====================================================================
 -- File manifests
 --
@@ -64,6 +57,19 @@ local SERVER_FILES = {
     "server/src/string_utils.lua",
     "server/src/table_utils.lua",
     "server/var/globals.lua",
+}
+
+-- =====================================================================
+-- Install profiles
+--
+-- Maps the user's single-character choice to the folder name and
+-- file manifest for that side. The folder names match the absolute
+-- `require` paths used inside the code, so no rewriting is needed.
+-- =====================================================================
+
+local PROFILES = {
+    client = { root = "stockpile_client", files = CLIENT_FILES },
+    server = { root = "stockpile_server", files = SERVER_FILES },
 }
 
 -- =====================================================================
@@ -149,17 +155,14 @@ if choice == "quit" then
     return
 end
 
-local files
-if choice == "client" then
-    files = CLIENT_FILES
-    ROOT  = "stockpile_client"
-else
-    files = SERVER_FILES
-    ROOT  = "stockpile_server"
-end
+local profile = PROFILES[choice]
+local ROOT    = profile.root
+local files   = profile.files
 
 print("")
-print("Will install into: " .. ROOT .. "/")
+print("Selected:  " .. choice)
+print("Install to: " .. ROOT .. "/")
+print("Files:     " .. #files .. " code files")
 
 -- If the install folder already exists, ask before clobbering it.
 if fs.exists(ROOT) then
@@ -178,7 +181,7 @@ ensure_dir(ROOT)
 -- --- Component files --------------------------------------------------
 
 print("")
-print("Downloading " .. choice .. " files...")
+print("Downloading into " .. ROOT .. "/ ...")
 
 local ok_count, fail_count = 0, 0
 
@@ -221,7 +224,7 @@ if startup_yes then
     local f = fs.open("startup.lua", "w")
     f.write('shell.run("' .. entry .. '")\n')
     f.close()
-    print("startup.lua written.")
+    print("startup.lua written -> " .. entry)
 end
 
 -- =====================================================================
@@ -230,7 +233,7 @@ end
 
 print("")
 if fail_count == 0 then
-    print("Installation complete (" .. ok_count .. " files).")
+    print("Installation complete (" .. ok_count .. " files into " .. ROOT .. "/).")
     if startup_yes then
         print("Rebooting in 3 seconds...")
         sleep(3)
