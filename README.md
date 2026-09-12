@@ -1,43 +1,66 @@
 <div align="center">
-  <img width="250px" alt="icon" src="icon.jpg">  
+  <img width="260" alt="Stockpile icon" src="icon.jpg">
+
+  # Stockpile
+
+  **A backend-grade Minecraft storage manager for [CC: Tweaked](https://tweaked.cc/).**
+
+  Index millions of items, search them with NBT-aware regex, move them between named inventory groups, and automate it all — from any computer on your Rednet network.
+
+  [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
+  [![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.114.2%2B-blueviolet)](https://tweaked.cc/)
+  [![Minecraft](https://img.shields.io/badge/Minecraft-1.20%2B-success)](https://www.minecraft.net/)
+  [![Lua](https://img.shields.io/badge/Lua-5.2%2B-informational)](https://www.lua.org/)
+
 </div>
 
+---
 
-# Stockpile
+Stockpile turns a warehouse full of chests into a queryable database. The **server** computer indexes every connected inventory, compresses the index to a few kilobytes on disk, and exposes a Rednet API. The **client** computer runs a full graphical UI built with Basalt to browse, search, move, and automate that storage.
 
-Stockpile is a backend Minecraft storage system using the CC: Tweaked mod. It provides an easy-to-use API to transfer items between inventory groups in a finely controlled way. It includes powerful search tools in the storage content database.
+The name is a nod to Dwarf Fortress — where a *stockpile* is the difference between an organized fortress and a floor covered in socks.
 
-**[Documentation](https://github.com/MintTee/Stockpile/blob/main/Documentation.md)** here.
+---
 
-## Features
+## Table of contents
 
-- **Blazingly Fast:** Item transfer speed can reach up to 128k items per *second*. Average search time in the database <10 ms.
-- **Flexible and Expandable:** Easily add and remove inventories to be part of your storage and define custom inventory groups to suit your needs.
-- **Efficient:** Uses storage space in the most efficient way possible, always trying to stack items together.
-- **NBT Support:** Filter searches and item transfers using regex searches in NBT data.
-- **Easy-to-Use API:** The API is comprehensive and can be called from any other computer, such as a frontend GUI client, automation programs, etc.
+- [Highlights](#highlights)
+- [Quick start](#quick-start)
+- [The client](#the-client)
+- [Automation DSL](#automation-dsl)
+- [The server](#the-server)
+- [API reference](#api-reference)
+- [Architecture](#architecture)
+- [Technical deep dive](#technical-deep-dive)
+- [Configuration](#configuration)
+- [Limitations](#limitations)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Installation
+---
 
-Inside a Computer Craft computer, type `wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/src/installer.lua`
+## Highlights
 
-If you encounter any issue during the installation process, please report it [here](https://github.com/MintTee/Stockpile/issues).
+| | |
+|---|---|
+| **Blazingly fast** | Transfer up to **128,000 items per second** by parallelizing every `pushItems` call through a coroutine queue. Average database search time: **under 10 ms**. |
+| **Compressed to the byte** | A 350,000-item index (≈100 double chests) fits in **24 KB** on disk. That's **14,400 items per kilobyte** — small enough to live on a floppy disk rotation. |
+| **NBT-aware** | Search and filter by any NBT attribute using Lua patterns — enchantments, custom names, potion effects, whatever the game exposes. |
+| **Named inventory groups** | Define arbitrary subsets of chests as `input`, `output`, `storage`, `sorted_iron`, or anything else. Move items between them with one call. |
+| **GUI client** | A full tabbed interface built on Basalt: search results with keyboard navigation, a group editor, a live usage bar, and persistent UI state across reboots. |
+| **Automation DSL** | Write declarative trigger→action pairs in a tiny Lua-flavoured language: `period(60) and item_qty(coal, input, <, 64) → scan_group(input)`. |
+| **Persistent** | The database survives reboots. The client remembers your filters, your selections, and your automation pairs. |
 
-## Limitations
+---
 
-- **Modded Slot Sizes:** Stockpile doesn't support modded inventories that can hold more than 64 items per slot (like the Drawers mod).
-- **NBT Limitations:** Due to limitations with the way CC: Tweaked interacts with Minecraft NBT data, Stockpile cannot read some NBT data like shulker content, potency or duration of potions, etc.
-- **No support for fluids mechanics** *ComingSoonTM*
+## Quick start
 
-## Roadmap
+You need **at least two CC: Tweaked computers** with wireless or wired modems, and any number of inventories (chests, barrels, drawers…) connected to the server via the peripheral network.
 
-- **Fluid support:** Adding fluid support to Stockpile.
-- **GUI Survival Client** An easy to use comprehensive GUI Client to search and query items from Stockpile with search features similar to JEI, REI or EMI.  
-- **SIGILS Compat** A simple program to make interfacing Stockpile with [SIGILS](https://github.com/fechan/SIGILS) easy.
-- **Auto schematic material list** Feature to automatically pull every item requiered from a schematic material list.
+### Install the server
 
-## Dependencies
+On the computer that has access to every chest, in a CraftOS shell:
 
-- Lua v5.2 or higher
-- CC: Tweaked 1.114.2 or higher with CraftOS v1.9 or higher
-- Minecraft 1.20 or higher
+```bash
+wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/installer.lua
