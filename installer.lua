@@ -6,17 +6,6 @@ local REPO   = "MintTee/Stockpile"
 local BRANCH = "main"
 local BASE   = "https://raw.githubusercontent.com/" .. REPO .. "/refs/heads/" .. BRANCH .. "/"
 
--- =====================================================================
--- File manifests
---
--- Paths are relative to the repo root. The first path segment
--- ("client/" or "server/") is stripped when writing to disk, so
--- "client/ui/search_tab.lua" lands at "stockpile_client/ui/search_tab.lua".
---
--- Only code files are downloaded. Documentation, icons, and other
--- non-runtime assets stay on GitHub and are not installed.
--- =====================================================================
-
 local CLIENT_FILES = {
     "client/app.lua",
     "client/main.lua",
@@ -59,25 +48,11 @@ local SERVER_FILES = {
     "server/var/globals.lua",
 }
 
--- =====================================================================
--- Install profiles
---
--- Maps the user's single-character choice to the folder name and
--- file manifest for that side. The folder names match the absolute
--- `require` paths used inside the code, so no rewriting is needed.
--- =====================================================================
-
 local PROFILES = {
     client = { root = "stockpile_client", files = CLIENT_FILES },
     server = { root = "stockpile_server", files = SERVER_FILES },
 }
 
--- =====================================================================
--- Helpers
--- =====================================================================
-
---- Recursively create directories. CC:Tweaked's fs.makeDir does not
---- create parent directories, so we walk the path one level at a time.
 local function ensure_dir(path)
     local parts = {}
     for part in path:gmatch("[^/]+") do
@@ -92,8 +67,6 @@ local function ensure_dir(path)
     end
 end
 
---- Download one file from `url` to `local_path`. Returns (true) on
---- success, (false, err) on failure.
 local function download_file(url, local_path)
     ensure_dir(fs.getDir(local_path))
     local response = http.get(url)
@@ -114,29 +87,22 @@ local function download_file(url, local_path)
     return true
 end
 
---- Show a single-character prompt and return the matching value from
---- `valid` (a table of {char = value}). Loops until a valid char.
 local function prompt(question, valid)
     while true do
         print(question)
         local _, char = os.pullEvent("char")
         char = char:lower()
-        if valid[char] then
+        if valid[char] ~= nil then
             return valid[char]
         end
     end
 end
 
---- Write an empty file (used for logs and default configs).
 local function touch(path)
     ensure_dir(fs.getDir(path))
     local f = fs.open(path, "w")
     if f then f.close() end
 end
-
--- =====================================================================
--- Main
--- =====================================================================
 
 print("=========================================")
 print("        Stockpile V2 installer")
@@ -164,7 +130,6 @@ print("Selected:  " .. choice)
 print("Install to: " .. ROOT .. "/")
 print("Files:     " .. #files .. " code files")
 
--- If the install folder already exists, ask before clobbering it.
 if fs.exists(ROOT) then
     print("")
     print("Directory '" .. ROOT .. "' already exists.")
@@ -178,15 +143,13 @@ end
 
 ensure_dir(ROOT)
 
--- --- Component files --------------------------------------------------
-
 print("")
 print("Downloading into " .. ROOT .. "/ ...")
 
 local ok_count, fail_count = 0, 0
 
 for _, file in ipairs(files) do
-    local rel        = file:gsub("^[^/]+/", "")  -- strip client/ or server/
+    local rel        = file:gsub("^[^/]+/", "")
     local local_path = ROOT .. "/" .. rel
     local ok, err    = download_file(BASE .. file, local_path)
     if ok then
@@ -198,17 +161,9 @@ for _, file in ipairs(files) do
     end
 end
 
--- --- Runtime files ----------------------------------------------------
--- Logs and per-machine configs should start empty; we never ship the
--- dev's logs or user groups.
-
 if choice == "server" then
     touch(ROOT .. "/logs/server.log")
 end
-
--- =====================================================================
--- Startup hook
--- =====================================================================
 
 print("")
 local startup_yes = prompt("Run Stockpile on computer startup? (y/n):",
@@ -225,11 +180,9 @@ if startup_yes then
     f.write('shell.run("' .. entry .. '")\n')
     f.close()
     print("startup.lua written -> " .. entry)
+else
+    print("Skipping startup hook. Run manually after boot.")
 end
-
--- =====================================================================
--- Summary
--- =====================================================================
 
 print("")
 if fail_count == 0 then
