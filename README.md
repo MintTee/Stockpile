@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="260" alt="Stockpile icon" src="icon.jpg">
+  <img width="260" alt="Stockpile icon" src="icon.png">
 
   # Stockpile
 
