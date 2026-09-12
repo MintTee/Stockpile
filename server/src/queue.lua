@@ -1,5 +1,5 @@
 -- Function Queue Manager // Parallel processing | Used for item transfers and scanning inventories content at much higher speed.
-queue = {}
+local queue = {}
 queue.__index = queue
 
 -- Create or return the queue instance
@@ -25,7 +25,6 @@ end
 
 -- Run all functions in the queue and then clear the queue
 function queue.run()
-    logger("Debug", "queue.run", "Asynch run of the function queue")
     local self = queue.get_instance()
     if #self.tasks > 0 then
         parallel.waitForAll(table.unpack(self.tasks))

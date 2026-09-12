@@ -1,0 +1,178 @@
+
+    size = 54,
+  },
+  [ "minecraft:chest_0" ] = {
+    slots = {
+      {
+        [ "minecraft:music_disc_strad" ] = 1,
+      },
+      {
+        [ "minecraft:slime_ball" ] = 24,
+      },
+      {
+        [ "minecraft:birch_sapling" ] = 10,
+      },
+      {
+        [ "minecraft:fire_coral" ] = 17,
+      },
+      {
+        [ "minecraft:book" ] = 18,
+      },
+      {
+        [ "minecraft:jungle_pressure_plate" ] = 52,
+      },
+      {
+        [ "minecraft:spruce_chest_boat" ] = 1,
+      },
+      {
+        [ "minecraft:light_blue_dye" ] = 40,
+      },
+      {
+        [ "minecraft:blue_concrete" ] = 30,
+      },
+      {
+        [ "minecraft:mossy_cobblestone_wall" ] = 9,
+      },
+      {
+        [ "minecraft:green_terracotta" ] = 30,
+      },
+      {
+        [ "minecraft:red_stained_glass_pane" ] = 13,
+      },
+      {
+        [ "minecraft:iron_hoe" ] = 1,
+      },
+      {
+        [ "minecraft:jukebox" ] = 64,
+      },
+      {
+        [ "minecraft:red_dye" ] = 32,
+      },
+      {
+        [ "minecraft:piglin_banner_pattern" ] = 1,
+      },
+      {
+        [ "minecraft:lectern" ] = 43,
+      },
+      {
+        [ "minecraft:chiseled_sandstone" ] = 54,
+      },
+      {
+        [ "minecraft:acacia_door" ] = 2,
+      },
+      {
+        [ "minecraft:azure_bluet" ] = 8,
+      },
+      {
+        [ "minecraft:gray_terracotta" ] = 23,
+      },
+      {
+        [ "minecraft:purpur_block" ] = 52,
+      },
+      {
+        [ "minecraft:iron_nugget" ] = 46,
+      },
+      {
+        [ "minecraft:dark_oak_door" ] = 62,
+      },
+      {
+        [ "minecraft:golden_hoe" ] = 1,
+      },
+      {
+        [ "minecraft:lime_stained_glass_pane" ] = 2,
+      },
+      {
+        [ "minecraft:trapped_chest" ] = 25,
+      },
+      {
+        [ "minecraft:andesite_wall" ] = 27,
+      },
+      {
+        [ "minecraft:red_shulker_box" ] = 1,
+      },
+      {
+        [ "minecraft:smooth_red_sandstone_slab" ] = 48,
+      },
+      {
+        [ "minecraft:crimson_stairs" ] = 22,
+      },
+      {
+        [ "minecraft:hopper" ] = 49,
+      },
+      {
+        [ "minecraft:mangrove_log" ] = 21,
+      },
+      {
+        [ "minecraft:polished_blackstone_wall" ] = 23,
+      },
+      {
+        [ "minecraft:lead" ] = 10,
+      },
+      {
+        [ "minecraft:oxidized_cut_copper_stairs" ] = 53,
+      },
+      {
+        [ "minecraft:light_blue_banner" ] = 5,
+      },
+      {
+        [ "minecraft:waxed_oxidized_cut_copper_slab" ] = 54,
+      },
+      {
+        [ "minecraft:stripped_crimson_hyphae" ] = 47,
+      },
+      {
+        [ "minecraft:feather" ] = 6,
+      },
+      {
+        [ "minecraft:red_sandstone_wall" ] = 48,
+      },
+      {
+        [ "minecraft:pink_concrete" ] = 27,
+      },
+      {
+        [ "minecraft:brown_mushroom_block" ] = 46,
+      },
+      {
+        [ "minecraft:creeper_banner_pattern" ] = 1,
+      },
+      {
+        [ "minecraft:blackstone" ] = 26,
+      },
+      {
+        [ "minecraft:jungle_planks" ] = 44,
+      },
+      {
+        [ "minecraft:gray_concrete_powder" ] = 1,
+      },
+      {
+        [ "minecraft:melon" ] = 15,
+      },
+      {
+        [ "minecraft:dark_oak_fence_gate" ] = 10,
+      },
+      {
+        [ "minecraft:crimson_hyphae" ] = 35,
+      },
+      {
+        [ "minecraft:warped_hyphae" ] = 45,
+      },
+      {
+        [ "minecraft:blue_wool" ] = 39,
+      },
+      {
+        [ "minecraft:yellow_bed" ] = 1,
+      },
+      {
+        [ "minecraft:cyan_stained_glass_pane" ] = 13,
+      },
+    },
+    size = 54,
+  },
+  [ "minecraft:chest_59" ] = {
+    slots = {},
+    size = 54,
+  },
+  [ "minecraft:chest_6" ] = {
+    slots = {},
+    size = 54,
+  },

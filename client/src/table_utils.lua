@@ -1,7 +1,8 @@
-table_utils = {}
+local table_utils = {}
 
 --Allows to dynamically add nested keys to a table. Used in the update_content function
 function table_utils.set_nested_value(t, keys, value)
+
     local current = t
     for i = 1, #keys - 1 do
         local key = keys[i]
@@ -110,24 +111,80 @@ function table_utils.print(tbl, indent)
     end
 end
 
---[[ NOT USED RN
+--traverses all keys and values of a multi dimentionnal table and returns a list of all values & keys (as strings)
+function table_utils.recursive_traverse(t, res)
+    res = res or {}
+    for k, v in pairs(t) do
+		if tonumber(k) == nil then table.insert(res, tostring(k)) end
+        if type(v) == "table" then
+            table_utils.recursive_traverse(v, res)
+		elseif type(v) == "string" then
+            table.insert(res, v)
+        end
+    end
+    return res
+end
+
+-- transforms a dict with key = bool to a list of all keys as strings
+function table_utils.switch_to_list(t)
+    local res = {}
+    for k, _ in pairs(t) do
+        table.insert(res, k)
+        t[k] = nil
+    end
+    return res
+end
+
+-- transforms list to a dict : key = bool
+function table_utils.switch_to_dict(t)
+    local res = {}
+    for _, v in ipairs(t) do
+        res[v] = true
+    end
+    return res
+end
+
+function table_utils.xor_table(t, t2)
+    local dict = table_utils.switch_to_dict(t)
+
+    for _, v in ipairs(t2) do
+        if dict[v] then
+            dict[v] = nil
+        else
+            dict[v] = true
+        end
+    end
+
+    return table_utils.switch_to_list(dict)
+end
+
+--[[ Not used
+
+--Returns a table (key = octet index and value = octet value) of a binary file
+function table_utils.bin_to_table(str)
+	local all_octets = {}
+	for i = 1, #str  do
+		local octet = string.byte(str ,i)
+		table.insert(all_octets, octet)
+	end
+	return all_octets
+end
+
 function table_utils.sort_table_by_keys(t)
-    -- Step 1: Extract the keys
     local keys = {}
     for key in pairs(t) do
         table.insert(keys, key)
     end
 
-    -- Step 2: Sort the keys
     table.sort(keys)
 
-    -- Step 3: Create a sorted list of key-value pairs
     local sorted_table = {}
     for _, key in ipairs(keys) do
         table.insert(sorted_table, { key = key, value = t[key] })
     end
 
     return sorted_table
-end]]
+end
+]]
 
 return table_utils

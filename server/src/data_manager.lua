@@ -1,25 +1,33 @@
-data = {}
+--NOT USED YET since we switched to binary compressed files -- need to implement in the futur (look at #string from bin encoding and decoding func and know the file size in advance ? In that case, split the file at a char (part 1, 2,3 ,4 etc...) and dynamically get remaining file space with fs.getFreeSpace(path) )
+
+--[[
+
+local log = require "/stockpile_server/src/log"
+local data = {}
+
+
+
 
 --Function to serialize and save data to a txt file in the computer.
 function data.save(filename, data)
-    local file = fs.open(filename, "w")  -- Open file for writing
+    local file = fs.open(filename, "w")
     if file then
-        file.write(textutils.serialize(data))  -- Serialize data and save it
-        file.close()  -- Close the file
+        file.write(textutils.serialize(data))
+        file.close()
     else
-        print("Error: Could not open file :"..filename.." for writing.")
+        log.error("Error: Could not open file :"..filename.." for writing.")
     end
 end
 
 --Function load data from a txt file in the computer and deserialize it.
 function data.load(filename)
-    local file = fs.open(filename, "r")  -- Open file for reading
+    local file = fs.open(filename, "r")
     if file then
-        local data = textutils.unserialize(file.readAll())  -- Read and unserialize data
-        file.close()  -- Close the file
+        local data = textutils.unserialize(file.readAll())
+        file.close()
         return data
     else
-        print("Error: Could not open file : "..filename.." for reading.")
+        log.error("Error: Could not open file : "..filename.." for reading.")
         return nil
     end
 end
@@ -165,7 +173,7 @@ function data.load_large_file_from_disks(filename)
                 local reassembled_content = table.concat(content_chunks, "\n")
                 return textutils.unserialize(reassembled_content)  -- Return reassembled table
             else
-                print("File not found: "..filename)
+                log.error("File not found: "..filename)
                 return
             end
         end
@@ -174,4 +182,7 @@ function data.load_large_file_from_disks(filename)
     end
 end
 
+
 return data
+
+]]
