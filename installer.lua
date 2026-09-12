@@ -13,6 +13,9 @@ local ROOT   = "stockpile"          -- top-level install folder
 -- Paths are relative to the repo root. The first path segment
 -- ("client/" or "server/") is stripped when writing to disk, so
 -- "client/ui/search_tab.lua" lands at "stockpile/ui/search_tab.lua".
+--
+-- Only code files are downloaded. Documentation, icons, and other
+-- non-runtime assets stay on GitHub and are not installed.
 -- =====================================================================
 
 local CLIENT_FILES = {
@@ -55,15 +58,6 @@ local SERVER_FILES = {
     "server/src/string_utils.lua",
     "server/src/table_utils.lua",
     "server/var/globals.lua",
-}
-
--- Shared files (LICENSE, README, docs). Downloaded to the install
--- root so they end up next to client/ or server/ in the tree.
-local SHARED_FILES = {
-    "LICENSE",
-    "README.md",
-    "Documentation.md",
-    "CONTRIBUTING.md",
 }
 
 -- =====================================================================
@@ -169,19 +163,6 @@ if fs.exists(ROOT) then
 end
 
 ensure_dir(ROOT)
-
--- --- Shared files -----------------------------------------------------
-
-print("")
-print("Downloading shared files...")
-for _, file in ipairs(SHARED_FILES) do
-    local ok, err = download_file(BASE .. file, ROOT .. "/" .. file)
-    if ok then
-        print("  OK   " .. file)
-    else
-        print("  SKIP " .. file .. " (" .. tostring(err) .. ")")
-    end
-end
 
 -- --- Component files --------------------------------------------------
 
