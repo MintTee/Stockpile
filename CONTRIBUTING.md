@@ -17,7 +17,7 @@ You can contribute in the following ways:
 - Becoming a maintainer
 
 ## Code change guidelines
-I developed Stockpile on `Minecraft 1.20.1, Lua v5.2 CC: Tweaked 1.114.2 with CraftOS v1.9`. If you would like to contribute to the project, I recommend you do it using the same environment. However, you can specifically try to improve backward compatibility if you wish and develop under lower versions of CC: Tweaked and Minecraft.
+I developed Stockpile on `Minecraft 26.2, Lua v5.2 CC: Tweaked 1.120.2 with CraftOS v1.9`. If you would like to contribute to the project, I recommend you do it using the same environment. However, you can specifically try to improve backward compatibility if you wish and develop under lower versions of CC: Tweaked and Minecraft.
 
 I didn't make the code the most understandable, even though I tried to refactor it as much as I could and make the variables and function names readable.
 
@@ -40,7 +40,7 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 When you make your pull request, remind me to credit you! I want to make sure everyone's contributions are recognized.
 
 ## Contributor License Agreement
-By contributing code to Stockpile, you agree to assign the copyright of your contributions to Martin Bost, the creator of Stockpile. The Stockpile source code is then licensed to the public under the terms in the `LICENSE` file in the project root (as of 29 Dec 2024, it is GPL v3, an Open Source license).
+By contributing code to Stockpile, you agree to assign the copyright of your contributions to Martin Bost, the creator of Stockpile. The Stockpile source code is then licensed to the public under the terms in the `LICENSE` file in the project root (as of 12 September 2026, it is GPL v3, an Open Source license).
 
 *This contributing guide was written following these examples:*
 *[briandk's Contributing template](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62)*

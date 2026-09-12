@@ -5,7 +5,7 @@
 
   **A backend-grade Minecraft storage manager for [CC: Tweaked](https://tweaked.cc/).**
 
-  Index millions of items, search them with NBT-aware regex, move them between named inventory groups, and automate it all — from any computer on your Rednet network.
+  Index millions of items, search the database with NBT-aware regex filters, move them between named inventory groups, and automate using a dedicated scripting language.
 
   [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
   [![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.114.2%2B-blueviolet)](https://tweaked.cc/)
@@ -16,9 +16,7 @@
 
 ---
 
-Stockpile turns a warehouse full of chests into a queryable database. The **server** computer indexes every connected inventory, compresses the index to a few kilobytes on disk, and exposes a Rednet API. The **client** computer runs a full graphical UI built with Basalt to browse, search, move, and automate that storage.
-
-The name is a nod to Dwarf Fortress — where a *stockpile* is the difference between an organized fortress and a floor covered in socks.
+Stockpile turns a room full of chests into a queryable database. The **server** computer indexes every connected inventory, compresses the index to a few kilobytes on disk, and exposes a Rednet API. The **client** computer runs a full graphical UI built with Basalt to browse, search, move, and automate that storage.
 
 ---
 
@@ -45,13 +43,11 @@ The name is a nod to Dwarf Fortress — where a *stockpile* is the difference be
 | | |
 |---|---|
 | **Blazingly fast** | Transfer up to **128,000 items per second** by parallelizing every `pushItems` call through a coroutine queue. Average database search time: **under 10 ms**. |
-| **Compressed to the byte** | A 350,000-item index (≈100 double chests) fits in **24 KB** on disk. That's **14,400 items per kilobyte** — small enough to live on a floppy disk rotation. |
-| **NBT-aware** | Search and filter by any NBT attribute using Lua patterns — enchantments, custom names, potion effects, whatever the game exposes. |
-| **Named inventory groups** | Define arbitrary subsets of chests as `input`, `output`, `storage`, `sorted_iron`, or anything else. Move items between them with one call. |
-| **GUI client** | A full tabbed interface built on Basalt: search results with keyboard navigation, a group editor, a live usage bar, and persistent UI state across reboots. |
-| **Automation DSL** | Write declarative trigger→action pairs in a tiny Lua-flavoured language: `period(60) and item_qty(coal, input, <, 64) → scan_group(input)`. |
-| **Persistent** | The database survives reboots. The client remembers your filters, your selections, and your automation pairs. |
-
+| **Compressed databse** | A 350,000-item index (≈100 double chests) uses **24 KB** of real disk space. |
+| **NBT-aware** | Search and filter by any NBT attribute using Lua patterns — enchantments, custom names, potion effects... |
+| **Named inventory groups** | Define subsets of chests as `input`, `output`, `storage`, `sorted_iron`, or anything else. Move items between them with one call. |
+| **GUI client** | A full tabbed interface built on Basalt2: search results with keyboard navigation, a group editor, a live usage bar, and persistent UI state across reboots. |
+| **Automation DSL** | Write declarative trigger→action pairs in a simple scripting language: `period(60) and item_qty(coal, farm, <, 64) → scan_group(input)`. |
 ---
 
 ## Quick start
