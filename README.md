@@ -8,8 +8,8 @@
   Index millions of items, search the database with NBT-aware regex filters, move them between named inventory groups, and automate using a dedicated scripting language.
 
   [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-  [![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.114.2%2B-blueviolet)](https://tweaked.cc/)
-  [![Minecraft](https://img.shields.io/badge/Minecraft-1.20%2B-success)](https://www.minecraft.net/)
+  [![CC: Tweaked](https://img.shields.io/badge/CC%3A%20Tweaked-1.120.2%2B-blueviolet)](https://tweaked.cc/)
+  [![Minecraft](https://img.shields.io/badge/Minecraft-26.2%2B-success)](https://www.minecraft.net/)
   [![Lua](https://img.shields.io/badge/Lua-5.2%2B-informational)](https://www.lua.org/)
 
 </div>
@@ -18,25 +18,14 @@
 
 Stockpile turns a room full of chests into a queryable database. The **server** computer indexes every connected inventory, compresses the index to a few kilobytes on disk, and exposes a Rednet API. The **client** computer runs a full graphical UI built with Basalt to browse, search, move, and automate that storage.
 
----
 
-## Table of contents
+## Install
 
-- [Highlights](#highlights)
-- [Quick start](#quick-start)
-- [The client](#the-client)
-- [Automation DSL](#automation-dsl)
-- [The server](#the-server)
-- [API reference](#api-reference)
-- [Architecture](#architecture)
-- [Technical deep dive](#technical-deep-dive)
-- [Configuration](#configuration)
-- [Limitations](#limitations)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
+In a Computer craft console, run :
 
----
+```bash
+wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/installer.lua
+```
 
 ## Highlights
 
@@ -50,13 +39,9 @@ Stockpile turns a room full of chests into a queryable database. The **server** 
 | **Automation DSL** | Write declarative trigger→action pairs in a simple scripting language: `period(60) and item_qty(coal, farm, <, 64) → scan_group(input)`. |
 ---
 
-## Quick start
+## Limitations
 
-You need **at least two CC: Tweaked computers** with wireless or wired modems, and any number of inventories (chests, barrels, drawers…) connected to the server via the peripheral network.
-
-### Install the server
-
-On the computer that has access to every chest, in a CraftOS shell:
-
-```bash
-wget run https://raw.githubusercontent.com/MintTee/Stockpile/refs/heads/main/installer.lua
+- **Fixed slot size.** The compression format assumes every item stacks to at most 64 and every inventory slot holds at most one item type. Modded inventories like Storage Drawers break this and are not supported.
+- **NBT visibility.** CC: Tweaked's `getItemDetail` cannot read some NBT — most notably the contents of shulker boxes, the potency/duration of potions, and anything inside a nested container.
+- **External mutation.** If a player takes items out of a chest by hand while Stockpile is running, the database will drift. You need to rescan affected groups periodically. Automation pairs can do this for you (`period(300) → scan_group(input)`).
+- **No fluids.** Liquid storage is not currently modelled. *Coming soon™*
