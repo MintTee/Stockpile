@@ -1,25 +1,4 @@
 -- /stockpile_client/main.lua
---[[
-
-How to implement the automation tab ?
-
-Triggers / conditions :
-
-period,
-redstone ss level < > = delta rising, delta falling, delta any, side of client computer (default to any)
-Threshold of item (all, each) > = < qty or (Item) in given group
-
-Command :
-
-Scan group
-move item (or blank) to from qty (all by default)
-
-COMBINE both sides (condition) WITH BOOL LOGIC (command just have AND option)
-    AND
-    OR
-    XOR
-    NOT
-]]
 
 local ROOT = "/stockpile_client"
 package.path = ROOT .. "/?.lua;" .. ROOT .. "/?/init.lua;" .. package.path
@@ -27,13 +6,6 @@ package.path = ROOT .. "/?.lua;" .. ROOT .. "/?/init.lua;" .. package.path
 local base_require = require
 local bas = base_require("lib.basalt")
 
--- Basalt replaces the global `require` with an override whose fallback
--- path calls the original require but forgets to `return` it, so every
--- external module resolves to nil even though it loaded fine. Wrap it
--- so the fallback returns what was loaded.
---
--- IMPORTANT: every external require(...) below MUST happen after this
--- wrapper is installed, otherwise the module comes back as nil.
 local basalt_require = require
 require = function(path)
     local result = basalt_require(path)
@@ -72,25 +44,6 @@ local function build_ui()
     local automationCtrl = setupAutomationTab(automationTab)
     setupHelpTab(helpTab)
 
-    -- -----------------------------------------------------------------
-    -- Restore persisted UI state.
-    --
-    -- Order matters:
-    --
-    --   1. load_pairs() REPLACES the single default pair created by
-    --      setupAutomationTab with however many pairs were saved.
-    --      This has to run BEFORE ui_state.load because the tree
-    --      walk keys pairs by their position among siblings — the
-    --      right number of frames must exist.
-    --
-    --   2. ui_state.load() restores text boxes, dropdown selections,
-    --      list selections, visibility, etc. DropDown restore fires
-    --      its select event so dependent lists repopulate, then a
-    --      second pass re-applies list item selections.
-    --
-    --   3. afterStateLoad() re-parses any pair whose text survived
-    --      the tree walk but whose AST was never rebuilt.
-    -- -----------------------------------------------------------------
     if automationCtrl and automationCtrl.load_pairs then
         pcall(function() automationCtrl:load_pairs() end)
     end
@@ -103,9 +56,6 @@ local function build_ui()
 
     searchCtrl:refreshUsageLabel()
 
-    -- -----------------------------------------------------------------
-    -- Persistence helper. Called on tab switch and on terminate.
-    -- -----------------------------------------------------------------
     local function persist_all()
         ui_state.save(rootf)
         if automationCtrl and automationCtrl.save_pairs then
@@ -113,24 +63,10 @@ local function build_ui()
         end
     end
 
-    -- -----------------------------------------------------------------
-    -- Save whenever the user switches tabs. This is the natural
-    -- checkpoint: any text they typed, any selection they made, any
-    -- pair they toggled, is captured the moment they leave the tab.
-    -- -----------------------------------------------------------------
     tabs:onChange("activeTab", function()
         persist_all()
     end)
 
-    -- -----------------------------------------------------------------
-    -- Keep selections stable across data refreshes.
-    --
-    -- Whenever groups are updated or server content comes in, several
-    -- Lists/DropDowns get rebuilt from scratch and lose their
-    -- selection. reapply_selections re-applies only the selection
-    -- state from the last snapshot, without touching text boxes or
-    -- any other live user input.
-    -- -----------------------------------------------------------------
     bas.onEvent("groups_updated", function()
         searchCtrl:refreshGroupDropdowns()
         searchCtrl:refreshSearchResults()

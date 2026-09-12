@@ -237,7 +237,7 @@ local function setupSearchTab(tab)
         if slots then
             ui.usageLabel:setText(string.format("%s items (%d%%)",
                 string_utils.formatMetricPrefix(item_total),
-                slots.used / slots.total * 100))
+                math.floor(slots.used / slots.total * 100)))
         else
             ui.usageLabel:setText("usage:unknown ")
         end
