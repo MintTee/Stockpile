@@ -17,6 +17,7 @@ function usage.getSlots(app)
     local all_slots, used_slots = 0, 0
 
     for _, inv in ipairs(app.groups.all) do
+        if not app.inv_index[inv] then return {total = all_slots, used = used_slots} end
         all_slots = all_slots + app.inv_index[inv].size
     end
 
