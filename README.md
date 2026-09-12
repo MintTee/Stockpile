@@ -3,7 +3,7 @@
 
   # Stockpile
 
-  **A backend-grade Minecraft storage manager for [CC: Tweaked](https://tweaked.cc/).**
+  **A Minecraft storage manager for [CC: Tweaked](https://tweaked.cc/).**
 
   Index millions of items, search the database with NBT-aware regex filters, move them between named inventory groups, and automate using a dedicated scripting language.
 
