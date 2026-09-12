@@ -4,22 +4,6 @@ local contentdb = require("/stockpile_server/src/contentdb")
 local log = require("/stockpile_server/src/log")
 require("/stockpile_server/var/globals")
 
---[[    EXAMPLE STRUCTURE OF COMMAND FROM A CLIENT
-
-invs = {minecraft:chest_1, minecraft:chest_2}
-rednet.send(
-    server_id,
-    {
-        type = "scan",
-        args = {invs, "arg2", 123},
-        uuid = 123,
-    },
-    "stockpile"
-    
-)
-
-]]
-
 local comms = {}
 local handlers = {}
 
@@ -43,32 +27,71 @@ function comms.open_all_modems()
     end
 end
 
--- Receives a command and adds it to the command queue if valid
+-- Sends a response back to a client. The message always carries the `uuid`
+-- (so the client can match it against the pending request) and a `result`
+-- table (so the client's callback fires with *something*, even on error).
+local function send_response(recipient, uuid, result)
+    rednet.send(recipient, { uuid = uuid, result = result }, "stockpile")
+end
+
+-- Receives a command and adds it to the command queue if valid.
+-- Malformed commands get an immediate error response so the client's
+-- pending entry is resolved instead of silently timing out.
 local function receive_command(cmd_queue)
     local id, cmd = rednet.receive("stockpile")
 
-    --check types, early return
-    if type(cmd.type) ~= "string" or (cmd.arg and type(cmd.arg) ~= "table") or type(cmd.uuid) ~= "number" then
-        log.error("Recieved command in wrong format")
+    local valid = type(cmd) == "table"
+        and type(cmd.type) == "string"
+        and type(cmd.args) == "table"
+        and type(cmd.uuid) == "number"
+
+    if not valid then
+        log.error("Received command in wrong format from " .. tostring(id))
+        -- Best-effort error response if we at least have a uuid to match against
+        if type(cmd) == "table" and type(cmd.uuid) == "number" then
+            send_response(id, cmd.uuid, { status = "fail", detail = "wrong argument format" })
+        end
         return
     end
 
-    cmd.sender = id --adds the sender to the body of the cmd
+    cmd.sender = id
     table.insert(cmd_queue, cmd)
 end
 
--- Processes a command from the queue and sends the result back to the client
+-- Runs the handler for a command type, catching errors and normalising the
+-- return value so the client always receives a table with a `status` field.
+local function run_handler(cmd_type, args)
+    local handler = handlers[cmd_type]
+    if not handler then
+        log.warn("Unknown command type: " .. tostring(cmd_type))
+        return { status = "fail", detail = "unknown command type: " .. tostring(cmd_type) }
+    end
+
+    local ok, result = pcall(handler, args)
+    if not ok then
+        log.error("Handler '" .. tostring(cmd_type) .. "' crashed: " .. tostring(result))
+        return { status = "fail", detail = "handler error: " .. tostring(result) }
+    end
+
+    if type(result) ~= "table" then
+        return { status = "fail", detail = "handler returned non-table result" }
+    end
+
+    return result
+end
+
+-- Processes a command from the queue and sends the result back to the client.
 local function process_command(cmd_queue)
     if #cmd_queue > 0 then
         local cmd = table.remove(cmd_queue, 1)
 
-        local handler = handlers[cmd.type]
-        if handler then
-            log.debug("cmd recieved = "..textutils.serialise(cmd.type))
-            cmd.result = handler(cmd.args)
-            rednet.send(cmd.sender, cmd, "stockpile") --respondes with the same message table + new result field
-            log.debug("Results : "..textutils.serialise(cmd.result.status), cmd.uuid)
-        end
+        log.debug("cmd received = " .. textutils.serialise(cmd.type))
+
+        local result = run_handler(cmd.type, cmd.args)
+
+        send_response(cmd.sender, cmd.uuid, result)
+
+        log.debug("Results : " .. textutils.serialise(result.status or "?"), cmd.uuid)
     end
     sleep(0.05)
 end
@@ -105,22 +128,29 @@ handlers.move_item = function(args)
 
     return move_item(from_invs, to_invs, item, qty, nbt)
 end
+
 handlers.search = function(args)
     local item, nbt = table.unpack(args)
-    if (item and type(item) ~= "string") or (nbt and type(nbt) ~= "string") then return {status = "fail", detail = "wrong argument format"} end
+    if (item and type(item) ~= "string") or (nbt and type(nbt) ~= "string") then
+        return {status = "fail", detail = "wrong argument format"}
+    end
     return contentdb.search(item, nbt)
 end
+
 handlers.usage = function()
     return contentdb.usage()
 end
+
 handlers.get_nbt = function(args)
     local item_id = table.unpack(args)
     if type(item_id) ~= "string" then return {status = "fail", detail = "wrong argument format"} end
     return contentdb.get_nbt(item_id)
 end
+
 handlers.list_all_inventories = function()
     return contentdb.list_all_inventories()
 end
+
 handlers.get_content = function()
     return contentdb.get_content()
 end

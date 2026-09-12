@@ -125,12 +125,12 @@ function table_utils.recursive_traverse(t, res)
     return res
 end
 
--- transforms a dict with key = bool to a list of all keys as strings
+-- transforms a dict with key = bool to a list of all keys
+-- Does not modify the input.
 function table_utils.switch_to_list(t)
     local res = {}
-    for k, _ in pairs(t) do
-        table.insert(res, k)
-        t[k] = nil
+    for k in pairs(t) do
+        res[#res + 1] = k
     end
     return res
 end
@@ -145,17 +145,24 @@ function table_utils.switch_to_dict(t)
 end
 
 function table_utils.xor_table(t, t2)
-    local dict = table_utils.switch_to_dict(t)
+    local in_t  = table_utils.switch_to_dict(t)
+    local in_t2 = table_utils.switch_to_dict(t2)
+    local seen  = {}
 
-    for _, v in ipairs(t2) do
-        if dict[v] then
-            dict[v] = nil
-        else
-            dict[v] = true
+    local res = {}
+    for _, v in ipairs(t) do
+        if not in_t2[v] and not seen[v] then
+            seen[v] = true
+            res[#res + 1] = v
         end
     end
-
-    return table_utils.switch_to_list(dict)
+    for _, v in ipairs(t2) do
+        if not in_t[v] and not seen[v] then
+            seen[v] = true
+            res[#res + 1] = v
+        end
+    end
+    return res
 end
 
 --[[ Not used

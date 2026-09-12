@@ -64,4 +64,15 @@ function dropdownUtils.makeScrollable(dropdown)
     return dropdown
 end
 
+-- Size a dropdown so the longest item plus padding fits.
+function dropdownUtils.fitWidth(dropdown, minWidth)
+    local maxLen = minWidth or 4
+    for _, item in ipairs(dropdown:getItems() or {}) do
+        local text = type(item) == "table" and item.text or item
+        if text and #text > maxLen then maxLen = #text end
+    end
+    dropdown:setWidth(maxLen + 2)
+    return dropdown
+end
+
 return dropdownUtils

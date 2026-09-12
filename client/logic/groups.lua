@@ -1,5 +1,5 @@
 -- logic/groups.lua
-local table_utils = dofile("/stockpile_client/src/table_utils.lua")
+local table_utils = require("src.table_utils")
 local groupsLogic = {}
 
 -- Add inventories to a target group (avoids duplicates)

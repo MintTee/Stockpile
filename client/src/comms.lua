@@ -1,9 +1,9 @@
--- client/src/comms.lua
-local log = dofile("/stockpile_client/lib/log.lua")
-local protocol = "stockpile"
+-- /stockpile_client/src/comms.lua
+local basalt = require("lib.basalt")
+
+local protocol  = "stockpile"
 local server_id = nil
-local pending = {}          -- uuid -> { callback, timer }
-local basalt = nil
+local pending   = {}
 
 local comms = {}
 
@@ -31,38 +31,27 @@ local function find_server()
     print("Server found, ID: " .. tostring(server_id))
 end
 
--- Send a command; callback will be called with the result (or nil on timeout)
-function comms.send(type, args, callback)
+function comms.send(kind, args, callback)
+    assert(server_id, "comms.send: server_id not set (call comms.init() first)")
     local uuid = gen_uuid()
-    local msg = { type = type, args = args, uuid = uuid }
-    rednet.send(server_id, msg, protocol)
-
-    local timer = os.startTimer(10)   -- 10 second timeout
-    pending[uuid] = { callback = callback, timer = timer }
+    rednet.send(server_id, { type = kind, args = args, uuid = uuid }, protocol)
+    pending[uuid] = { callback = callback, timer = os.startTimer(10) }
 end
 
--- Internal: dispatch an incoming response
 local function handle_response(msg)
-    local uuid = msg.uuid
-    local entry = pending[uuid]
+    local entry = pending[msg.uuid]
     if not entry then return end
-
     os.cancelTimer(entry.timer)
-    pending[uuid] = nil
-
-    if entry.callback then
-        entry.callback(msg.result)
-    end
+    pending[msg.uuid] = nil
+    if entry.callback then entry.callback(msg.result) end
 end
 
--- Called on every "rednet_message" event
-function comms.onRednetMessage(sender, message, protocolName)
+function comms.onRednetMessage(_, message, protocolName)
     if protocolName ~= protocol then return end
     if not message.uuid or not pending[message.uuid] then return end
     handle_response(message)
 end
 
--- Called on every "timer" event
 function comms.onTimer(timerID)
     for uuid, entry in pairs(pending) do
         if entry.timer == timerID then
@@ -72,26 +61,18 @@ function comms.onTimer(timerID)
     end
 end
 
--- Initialise the module: find server and hook into Basalt's event system
-function comms.init(bas)
-    basalt = bas
+function comms.init()
     find_server()
-
-    -- Register event listeners using basalt.onEvent (global function)
-    basalt.onEvent("rednet_message", function(sender, message, protocolName)
-        comms.onRednetMessage(sender, message, protocolName)
-    end)
-    basalt.onEvent("timer", function(timerID)
-        comms.onTimer(timerID)
-    end)
+    basalt.onEvent("rednet_message", comms.onRednetMessage)
+    basalt.onEvent("timer", comms.onTimer)
 end
 
--- Async helpers for your application
 function comms.getContentAsync(app, callback)
     comms.send("get_content", {}, function(result)
-        if result then
+        if result and result.status == "done" and result.data then
             app.item_index = result.data.item_index
-            app.inv_index = result.data.inv_index
+            app.inv_index  = result.data.inv_index
+            basalt.triggerEvent("content_updated")
         end
         if callback then callback(result) end
     end)
@@ -99,7 +80,7 @@ end
 
 function comms.listAllInventoriesAsync(app, callback)
     comms.send("list_all_inventories", {}, function(result)
-        if result then
+        if result and result.status == "done" and result.data then
             table.sort(result.data)
             app.groups.all = result.data
         end
@@ -107,8 +88,12 @@ function comms.listAllInventoriesAsync(app, callback)
     end)
 end
 
-function comms.moveItemAsync(from_invs, to_invs, item, qty, nbt, callback)
-    comms.send("move_item", {from_invs, to_invs, item, qty, nbt}, callback)
+function comms.moveItemAsync(from_invs, to_invs, item, qty, callback)
+    comms.send("move_item", { from_invs, to_invs, item, qty }, callback)
+end
+
+function comms.scanAsync(invs, callback)
+    comms.send("scan", { invs }, callback)
 end
 
 return comms

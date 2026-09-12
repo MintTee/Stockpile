@@ -6,10 +6,21 @@ local REPO   = "MintTee/Stockpile"
 local BRANCH = "main"
 local BASE   = "https://raw.githubusercontent.com/" .. REPO .. "/refs/heads/" .. BRANCH .. "/"
 
+-- =====================================================================
+-- File manifests
+--
+-- Paths are relative to the repo root. The first path segment
+-- ("client/" or "server/") is stripped when writing to disk, so
+-- "client/ui/search_tab.lua" lands at "stockpile_client/ui/search_tab.lua".
+--
+-- Only code files are downloaded. Documentation, icons, logs, and
+-- per-installation state (groups, database, dictionary) are NOT
+-- shipped — they are created locally by this installer.
+-- =====================================================================
+
 local CLIENT_FILES = {
     "client/app.lua",
     "client/main.lua",
-    "client/config/groups.txt",
     "client/lib/basalt.lua",
     "client/lib/log.lua",
     "client/logic/groups.lua",
@@ -20,6 +31,7 @@ local CLIENT_FILES = {
     "client/src/data.lua",
     "client/src/string_utils.lua",
     "client/src/table_utils.lua",
+    "client/src/ui_state.lua",
     "client/ui/automation_parser.lua",
     "client/ui/automation_tab.lua",
     "client/ui/components.lua",
@@ -30,14 +42,12 @@ local CLIENT_FILES = {
 }
 
 local SERVER_FILES = {
-    "server/bin/db.bin",
-    "server/bin/dict.bin",
     "server/lib/bitstream.lua",
     "server/lib/LibDeflate.lua",
     "server/src/bin.lua",
     "server/src/comms.lua",
     "server/src/contentdb.lua",
-    "server/src/data_manager.lua",
+    "server/src/data_drive_splitter.lua",
     "server/src/dict.lua",
     "server/src/log.lua",
     "server/src/main.lua",
@@ -48,11 +58,25 @@ local SERVER_FILES = {
     "server/var/globals.lua",
 }
 
+-- =====================================================================
+-- Install profiles
+--
+-- Maps the user's single-character choice to the folder name and
+-- file manifest for that side. The folder names match the absolute
+-- `require` paths used inside the code, so no rewriting is needed.
+-- =====================================================================
+
 local PROFILES = {
     client = { root = "stockpile_client", files = CLIENT_FILES },
     server = { root = "stockpile_server", files = SERVER_FILES },
 }
 
+-- =====================================================================
+-- Helpers
+-- =====================================================================
+
+--- Recursively create directories. CC:Tweaked's fs.makeDir does not
+--- create parent directories, so we walk the path one level at a time.
 local function ensure_dir(path)
     local parts = {}
     for part in path:gmatch("[^/]+") do
@@ -67,6 +91,8 @@ local function ensure_dir(path)
     end
 end
 
+--- Download one file from `url` to `local_path`. Returns (true) on
+--- success, (false, err) on failure.
 local function download_file(url, local_path)
     ensure_dir(fs.getDir(local_path))
     local response = http.get(url)
@@ -87,6 +113,22 @@ local function download_file(url, local_path)
     return true
 end
 
+--- Write a file with the given content, creating parent directories.
+local function write_file(path, content)
+    ensure_dir(fs.getDir(path))
+    local f = fs.open(path, "w")
+    if f then
+        f.write(content)
+        f.close()
+    end
+end
+
+--- Show a single-character prompt and return the matching value from
+--- `valid` (a table of {char = value}). Loops until a valid char.
+---
+--- NOTE: we test with `~= nil` rather than truthiness, because the
+--- valid table may legitimately map a key to `false` (as the y/n
+--- prompts do), and `if false then` would keep looping forever.
 local function prompt(question, valid)
     while true do
         print(question)
@@ -98,11 +140,9 @@ local function prompt(question, valid)
     end
 end
 
-local function touch(path)
-    ensure_dir(fs.getDir(path))
-    local f = fs.open(path, "w")
-    if f then f.close() end
-end
+-- =====================================================================
+-- Main
+-- =====================================================================
 
 print("=========================================")
 print("        Stockpile V2 installer")
@@ -130,6 +170,7 @@ print("Selected:  " .. choice)
 print("Install to: " .. ROOT .. "/")
 print("Files:     " .. #files .. " code files")
 
+-- If the install folder already exists, ask before clobbering it.
 if fs.exists(ROOT) then
     print("")
     print("Directory '" .. ROOT .. "' already exists.")
@@ -143,13 +184,15 @@ end
 
 ensure_dir(ROOT)
 
+-- --- Component files --------------------------------------------------
+
 print("")
 print("Downloading into " .. ROOT .. "/ ...")
 
 local ok_count, fail_count = 0, 0
 
 for _, file in ipairs(files) do
-    local rel        = file:gsub("^[^/]+/", "")
+    local rel        = file:gsub("^[^/]+/", "")  -- strip client/ or server/
     local local_path = ROOT .. "/" .. rel
     local ok, err    = download_file(BASE .. file, local_path)
     if ok then
@@ -161,9 +204,43 @@ for _, file in ipairs(files) do
     end
 end
 
-if choice == "server" then
-    touch(ROOT .. "/logs/server.log")
+-- =====================================================================
+-- Runtime scaffolding
+--
+-- We deliberately do NOT ship any file that represents per-installation
+-- state: the dev's groups, the dev's database, the dev's dictionary,
+-- the dev's logs. Instead we create locally the minimum structure the
+-- runtime needs to boot cleanly.
+-- =====================================================================
+
+print("")
+print("Creating runtime scaffolding...")
+
+if choice == "client" then
+    -- The client calls app:loadGroups() on startup and errors if
+    -- config/groups.txt is missing. Seed it with a valid empty table;
+    -- the user populates it through the Groups tab.
+    write_file(ROOT .. "/config/groups.txt",
+        textutils.serialize({ all = {} }))
+    print("  OK   config/groups.txt          (empty)")
+
+    -- ui_state.json and automation_pairs.txt are created by the client
+    -- on first save. They live in config/ alongside groups.txt, which
+    -- now exists, so nothing more to do.
+
+elseif choice == "server" then
+    -- The server writes /bin/db.bin and /bin/dict.bin on first save,
+    -- and appends to /logs/server.log continuously. Both directories
+    -- must exist or those writes will silently fail.
+    ensure_dir(ROOT .. "/bin")
+    ensure_dir(ROOT .. "/logs")
+    print("  OK   bin/                       (empty)")
+    print("  OK   logs/                      (empty)")
 end
+
+-- =====================================================================
+-- Startup hook
+-- =====================================================================
 
 print("")
 local startup_yes = prompt("Run Stockpile on computer startup? (y/n):",
@@ -176,13 +253,15 @@ if startup_yes then
     else
         entry = ROOT .. "/src/main.lua"
     end
-    local f = fs.open("startup.lua", "w")
-    f.write('shell.run("' .. entry .. '")\n')
-    f.close()
+    write_file("startup.lua", 'shell.run("' .. entry .. '")\n')
     print("startup.lua written -> " .. entry)
 else
     print("Skipping startup hook. Run manually after boot.")
 end
+
+-- =====================================================================
+-- Summary
+-- =====================================================================
 
 print("")
 if fail_count == 0 then

@@ -1,18 +1,19 @@
--- ui/group_tab.lua
-local components = dofile("/stockpile_client/ui/components.lua")
-local groupsLogic = dofile("/stockpile_client/logic/groups.lua")
-local dropdownUtils = dofile("/stockpile_client/ui/dropdown_utils.lua")
+-- /stockpile_client/ui/group_tab.lua
+local bas           = require("lib.basalt")
+local app           = require("app")
+local components    = require("ui.components")
+local groupsLogic   = require("logic.groups")
+local dropdownUtils = require("ui.dropdown_utils")
+local comms         = require("src.comms")
 
-local function setupGroupTab(tab, app, bas)
+local function setupGroupTab(tab)
     local ui = {}
 
-    -- Inventory list for the selected group
     ui.invList = components.createBetterList(tab, 1, 2, 22, tab:getHeight() - 4, {
         multiSelection = true,
-        background = colors.white
+        background = colors.white,
     })
 
-    -- Group dropdown
     ui.groupDropdown = tab:addDropDown()
         :setPosition(1, 1)
         :setSize(22, 1)
@@ -20,13 +21,11 @@ local function setupGroupTab(tab, app, bas)
     ui.groupDropdown.z = 10
     dropdownUtils.makeScrollable(ui.groupDropdown)
 
-    -- Refresh group dropdown and select a given group
     local function refreshGroupDropdown(selectGroup)
         ui.groupDropdown:clear()
         for group in pairs(app.groups) do
-            ui.groupDropdown:addItem({text = group, selected = false})
+            ui.groupDropdown:addItem({ text = group, selected = false })
         end
-        -- Try to select the given group
         local found = false
         for i, item in ipairs(ui.groupDropdown.items) do
             if item.text == selectGroup then
@@ -40,23 +39,19 @@ local function setupGroupTab(tab, app, bas)
         end
     end
 
-    -- Refresh the inventory list for the selected group
     function ui:refreshInventoryList()
         ui.invList:clear()
         ui.invList:scrollToTop()
-        local group = ui.groupDropdown:getSelectedItem() and ui.groupDropdown:getSelectedItem().text
+        local group = ui.groupDropdown:getSelectedItem()
+            and ui.groupDropdown:getSelectedItem().text
         if not group then return end
-        local invs = app.groups[group] or {}
-        for _, inv in ipairs(invs) do
+        for _, inv in ipairs(app.groups[group] or {}) do
             ui.invList:addItem(inv)
         end
     end
 
-    -- When group dropdown changes
     ui.groupDropdown:onSelect(function() ui:refreshInventoryList() end)
 
-    -- Buttons
-    -- Create group
     tab:addButton()
         :setPosition(12, tab:getHeight() - 1)
         :setSize(12, 1)
@@ -64,12 +59,8 @@ local function setupGroupTab(tab, app, bas)
         :setBackground(colors.blue)
         :onClick(function()
             local popup = components.createPopup(tab, "New Group", 30, 10)
-            popup:addLabel()
-                :setPosition(2, 3)
-                :setText("Group name:")
-            local nameInput = popup:addInput()
-                :setPosition(14, 3)
-                :setSize(14, 1)
+            popup:addLabel():setPosition(2, 3):setText("Group name:")
+            local nameInput = popup:addInput():setPosition(14, 3):setSize(14, 1)
             popup:addButton()
                 :setPosition(14, 6)
                 :setSize(8, 1)
@@ -86,14 +77,14 @@ local function setupGroupTab(tab, app, bas)
                 end)
         end)
 
-    -- Delete group
     tab:addButton()
         :setPosition(1, tab:getHeight() - 1)
         :setSize(9, 1)
         :setText("del group")
         :setBackground(colors.red)
         :onClick(function()
-            local group = ui.groupDropdown:getSelectedItem() and ui.groupDropdown:getSelectedItem().text
+            local group = ui.groupDropdown:getSelectedItem()
+                and ui.groupDropdown:getSelectedItem().text
             if not group then return end
             groupsLogic.deleteGroup(group, app)
             refreshGroupDropdown("all")
@@ -101,22 +92,20 @@ local function setupGroupTab(tab, app, bas)
             bas.triggerEvent("groups_updated")
         end)
 
-    -- Add inventories to group
     tab:addButton()
         :setPosition(1, tab:getHeight() - 2)
         :setSize(9, 1)
         :setText("add to")
         :setBackground(colors.green)
         :onClick(function()
-            local sel_group = ui.groupDropdown:getSelectedItem() and ui.groupDropdown:getSelectedItem().text
+            local sel_group = ui.groupDropdown:getSelectedItem()
+                and ui.groupDropdown:getSelectedItem().text
             if not sel_group then return end
             local selection = ui.invList:getSelectedItems()
             if #selection == 0 then return end
 
             local popup = components.createPopup(tab, "Add invs to group", 30, 10)
-            popup:addLabel()
-                :setPosition(2, 3)
-                :setText("Target group:")
+            popup:addLabel():setPosition(2, 3):setText("Target group:")
 
             local targetDropdown = popup:addDropDown()
                 :setPosition(14, 3)
@@ -125,7 +114,7 @@ local function setupGroupTab(tab, app, bas)
 
             for group in pairs(app.groups) do
                 if group ~= sel_group then
-                    targetDropdown:addItem({text = group, selected = false})
+                    targetDropdown:addItem({ text = group, selected = false })
                 end
             end
             if targetDropdown.items[1] then targetDropdown.items[1].selected = true end
@@ -137,7 +126,8 @@ local function setupGroupTab(tab, app, bas)
                 :setText("Add")
                 :setBackground(colors.green)
                 :onClick(function()
-                    local target_group = targetDropdown:getSelectedItem() and targetDropdown:getSelectedItem().text
+                    local target_group = targetDropdown:getSelectedItem()
+                        and targetDropdown:getSelectedItem().text
                     if not target_group then return end
                     local invNames = {}
                     for _, inv in ipairs(selection) do
@@ -150,14 +140,14 @@ local function setupGroupTab(tab, app, bas)
                 end)
         end)
 
-    -- Remove inventories from group
     tab:addButton()
         :setPosition(12, tab:getHeight() - 2)
         :setSize(11, 1)
         :setText("remove from")
         :setBackground(colors.yellow)
         :onClick(function()
-            local group = ui.groupDropdown:getSelectedItem() and ui.groupDropdown:getSelectedItem().text
+            local group = ui.groupDropdown:getSelectedItem()
+                and ui.groupDropdown:getSelectedItem().text
             if not group then return end
             local selection = ui.invList:getSelectedItems()
             if #selection == 0 then return end
@@ -169,14 +159,65 @@ local function setupGroupTab(tab, app, bas)
             refreshGroupDropdown(group)
             ui:refreshInventoryList()
         end)
+    
+        -- Rescan group content tab
+        tab:addButton()
+            :setPosition(25, tab:getHeight() - 1)
+            :setSize(10, 1)
+            :setText("scan group")
+            :setBackground(colors.lightBlue)
+            :onClick(function(self)
+                local group = ui.groupDropdown:getSelectedItem()
+                    and ui.groupDropdown:getSelectedItem().text
+                if not group then return end
 
-    -- Initial refresh
+                local invs = app.groups[group] or {}
+                if #invs == 0 then
+                    self:setBackground(colors.red)
+                    self:setText("empty group")
+                    bas.schedule(function()
+                        sleep(1)
+                        self:setBackground(colors.lightBlue)
+                        self:setText("scan group")
+                    end)
+                    return
+                end
+
+                self:setBackground(colors.yellow)
+                self:setText("scanning...")
+
+                comms.scanAsync(invs, function(result)
+                    if result and result.status == "done" then
+                        -- Refresh the item/inv index so the search tab picks up
+                        -- the new totals before we tell it to redraw.
+                        comms.getContentAsync(app, function()
+                            self:setBackground(colors.green)
+                            self:setText("scan done")
+                            bas.schedule(function()
+                                sleep(2)
+                                self:setBackground(colors.lightBlue)
+                                self:setText("scan group")
+                            end)
+                            bas.triggerEvent("groups_updated")
+                        end)
+                    else
+                        self:setBackground(colors.red)
+                        self:setText("scan fail")
+                        bas.schedule(function()
+                            sleep(2)
+                            self:setBackground(colors.lightBlue)
+                            self:setText("scan group")
+                        end)
+                    end
+                end)
+            end)
+
     refreshGroupDropdown("all")
     ui:refreshInventoryList()
 
-    -- Expose refresh method for external updates (e.g., after data load)
     function ui:refresh()
-        refreshGroupDropdown(ui.groupDropdown:getSelectedItem() and ui.groupDropdown:getSelectedItem().text or "all")
+        refreshGroupDropdown(ui.groupDropdown:getSelectedItem()
+            and ui.groupDropdown:getSelectedItem().text or "all")
         ui:refreshInventoryList()
     end
 

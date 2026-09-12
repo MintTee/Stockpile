@@ -5,6 +5,7 @@ function usage.getTotal(app)
     if not app.inv_index or not app.item_index then return end
     local c = 0
     for _, item in pairs(app.item_index) do
+        if not item.total then item.total = 1 end
         c = c + item.total
     end
     return c

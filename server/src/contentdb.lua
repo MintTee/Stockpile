@@ -172,8 +172,6 @@ function contentdb.scan(invs)
     if not f then return end
     f:write(textutils.serialise(inv_index["minecraft:chest_10"]))
     f:close()]]
-
-    db_changed = true
     return {status = "done", detail = "scan successful in updating db content"}
 end
 
@@ -248,7 +246,7 @@ function contentdb.first_empty_slot(invs)
             if empty_slot then return empty_slot end --returns the inv and slot of first empty slot option
         else
             --the inventory is completly empty, returns the slot #1
-            return {current_inv, 1}
+            return {inv = current_inv, slot = 1}
         end
     end
 
@@ -305,6 +303,7 @@ end
 
 -- Main update function
 function contentdb.update(inv_id, slot, item, qty, stack_size, inv_size, nbt, dispn)
+    db_changed = true
 
     stack_size = stack_size or table_utils.try_get_value(item_index, {item, "stack_size"})
     local existing_qty = table_utils.try_get_value(inv_index, {inv_id, "slots", slot, item}) or 0

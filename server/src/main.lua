@@ -1,3 +1,4 @@
+--main.lua
 local comms = require("/stockpile_server/src/comms")
 local log = require("/stockpile_server/src/log")
 local contentdb = require("/stockpile_server/src/contentdb")
@@ -40,5 +41,4 @@ local function main()
     )
 end
 
---local res = peripheral.call("minecraft:chest_10", "pushItems", "minecraft:chest_0", 1, 56, 2)
 main()

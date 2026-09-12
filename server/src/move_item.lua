@@ -1,6 +1,7 @@
 local queue = require("/stockpile_server/src/queue")
 local contentdb = require("/stockpile_server/src/contentdb")
 local log = require("/stockpile_server/src/log")
+local table_utils = require("/stockpile_server/src/table_utils")
 
 -- Helper to test if an item name matches the given filter.
 -- filter can be:
@@ -40,9 +41,111 @@ local function push_items(from_inv, from_slot, to_inv, to_slot, qty)
     end
 end
 
+-- Pre-flight validation. Walks the move list and simulates where each entry
+-- would land, using only local scratch tables. If anything wouldn't fit,
+-- returns (false, reason) without having touched inv_index or item_index.
+local function can_fit(to_move_list, to_invs)
+    -- Free slots per destination inventory.
+    local free = {}
+    for _, inv in ipairs(to_invs) do
+        local size = table_utils.try_get_value(inv_index, {inv, "size"})
+        if not size then
+            return false, "unknown inventory size for " .. tostring(inv)
+        end
+
+        local occupied = {}
+        for slot, _ in pairs(table_utils.try_get_value(inv_index, {inv, "slots"}) or {}) do
+            if type(slot) == "number" then occupied[slot] = true end
+        end
+
+        local list = {}
+        for s = 1, size do
+            if not occupied[s] then list[#list + 1] = s end
+        end
+        free[inv] = { list = list, idx = 1 }
+    end
+
+    -- Scratch copy of remaining room in every partially filled slot,
+    -- grouped by item name. Only non-full slots are copied.
+    local partials = {}
+    for _, inv in ipairs(to_invs) do
+        for item, data in pairs(item_index) do
+            local pf = data.part_filled_slots and data.part_filled_slots[inv]
+            if pf then
+                for slot, qty in pairs(pf) do
+                    if qty > 0 and qty < data.stack_size then
+                        local bucket = partials[item]
+                        if not bucket then bucket = {}; partials[item] = bucket end
+                        bucket[#bucket + 1] = {
+                            inv   = inv,
+                            slot  = slot,
+                            space = data.stack_size - qty,
+                        }
+                    end
+                end
+            end
+        end
+    end
+
+    local function take_empty()
+        for _, inv in ipairs(to_invs) do
+            local f = free[inv]
+            if f.idx <= #f.list then
+                local s = f.list[f.idx]
+                f.idx = f.idx + 1
+                return inv, s
+            end
+        end
+        return nil
+    end
+
+    for _, v in ipairs(to_move_list) do
+        local item       = next(inv_index[v.inv].slots[v.slot])
+        local stack_size = item_index[item].stack_size
+        local remaining  = v.qty
+
+        -- Mirror the real branch selection exactly:
+        --   full stacks (or moves with no partial stack available)
+        --   skip the top-off and go straight to a fresh slot.
+        local bucket       = partials[item]
+        local will_top_off = (v.qty ~= stack_size) and bucket and #bucket > 0
+
+        if will_top_off then
+            for _, p in ipairs(bucket) do
+                if remaining <= 0 then break end
+                local take = math.min(p.space, remaining)
+                p.space    = p.space - take
+                remaining  = remaining - take
+            end
+        end
+
+        if remaining > 0 then
+            local inv, slot = take_empty()
+            if not inv then
+                return false, "Destination inventories are probably full, aborting transfer request. Please verify the target inventories have empty space"
+            end
+
+            -- If the leftover doesn't fill the new slot, register it so a
+            -- later entry of the same item can top it off.
+            if remaining < stack_size then
+                local b = partials[item]
+                if not b then b = {}; partials[item] = b end
+                b[#b + 1] = { inv = inv, slot = slot, space = stack_size - remaining }
+            end
+        end
+    end
+
+    return true
+end
+
 --Sub-function of the move_item function. Moves the actual item.
 --Revieves a list of inv:slot tuple to move from the "move_item" function and decides where to send them.
 local function move_list(to_move_list, to_invs)
+
+    local ok, reason = can_fit(to_move_list, to_invs)
+    if not ok then
+        return {status = "fail", detail = reason}
+    end
 
     -- we have a list of items to move (from a set of inv to an other set)
     -- for each entry in the list : move the item
@@ -149,7 +252,6 @@ local function move_item(from_invs, to_invs, item, qty, nbt_regex_filter)
         return {status = "done", detail = "Nothing to move. Found no item corresponding the filters"}
     end
 
-    db_changed = true
     return move_list(to_move_list, to_invs)
 end
 
