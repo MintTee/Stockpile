@@ -610,8 +610,6 @@ inv_index = {
 | `size` | Number of slots in this inventory. 27 for a single chest, 54 for a double, 27 for most modded. |
 | `slots` | Sparse map: **only occupied slots** appear. `slot_index → { [item_id] = qty }`. |
 
-**Why nested?** A single slot can only ever hold one item type in vanilla Minecraft. The inner table always has exactly one key. The nesting exists so modded slots that hold multiple items can be supported in a future version.
-
 ### Inventory groups
 
 Groups are a **client-side** concept. The server has no idea what a group is. When the client calls `move_item(group_a, group_b)`, it expands each group into a flat list of inventory names before sending the message.
