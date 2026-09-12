@@ -5,3 +5,5 @@
 - The client side code and UI has a more heavy use of LLMs as to speed up the GUI dev process as well as to compensate for my inexperience in UI design and refactoring the Basalt library.
 
 - The documentation has been almost entirely written by AI. Although it is a good teaching exercise to write your own documentation, it is also very time-consuming. I have therefore used LLMs to write it quickly even though is it quite verbose.
+
+LLM used : ChatGPT, Deepseek, Mistral
