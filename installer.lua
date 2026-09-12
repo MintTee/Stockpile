@@ -5,14 +5,20 @@
 local REPO   = "MintTee/Stockpile"
 local BRANCH = "main"
 local BASE   = "https://raw.githubusercontent.com/" .. REPO .. "/refs/heads/" .. BRANCH .. "/"
-local ROOT   = "stockpile"          -- top-level install folder
+
+-- ROOT is set after the user picks client or server. The two sides
+-- install into separate folders so both can coexist on the same
+-- computer without collision, and so the internal `require` paths
+-- in the code (/stockpile_client/…, /stockpile_server/…) resolve
+-- correctly without any rewriting.
+local ROOT
 
 -- =====================================================================
 -- File manifests
 --
 -- Paths are relative to the repo root. The first path segment
 -- ("client/" or "server/") is stripped when writing to disk, so
--- "client/ui/search_tab.lua" lands at "stockpile/ui/search_tab.lua".
+-- "client/ui/search_tab.lua" lands at "stockpile_client/ui/search_tab.lua".
 --
 -- Only code files are downloaded. Documentation, icons, and other
 -- non-runtime assets stay on GitHub and are not installed.
@@ -146,9 +152,14 @@ end
 local files
 if choice == "client" then
     files = CLIENT_FILES
+    ROOT  = "stockpile_client"
 else
     files = SERVER_FILES
+    ROOT  = "stockpile_server"
 end
+
+print("")
+print("Will install into: " .. ROOT .. "/")
 
 -- If the install folder already exists, ask before clobbering it.
 if fs.exists(ROOT) then
