@@ -232,12 +232,13 @@ local function setupSearchTab(tab)
     end
 
     function ui:refreshUsageLabel()
-        local slots       = usage.getSlots(app)
-        local item_total  = usage.getTotal(app)
-        if slots then
-            ui.usageLabel:setText(string.format("%s items (%d%%)",
+        local slots = usage.getSlots(app)
+        local item_total = usage.getTotal(app)
+        if slots and slots.total and slots.total > 0 then
+            local pct = slots.used / slots.total * 100
+            ui.usageLabel:setText(string.format("%s items (%.0f%%)",
                 string_utils.formatMetricPrefix(item_total),
-                math.floor(slots.used / slots.total * 100)))
+                pct))
         else
             ui.usageLabel:setText("usage:unknown ")
         end
